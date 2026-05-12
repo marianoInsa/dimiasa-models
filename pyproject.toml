@@ -1,0 +1,42 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "dimiasa_models"
+version = "0.0.1"
+description = "Analizar los modelos inteligentes y ciencia de datos para usar en los modelos de IoT."
+authors = [
+  { name = "Centro de Investigaci\u00f3n Aplicada en Tecnolog\u00edas de la Informaci\u00f3n y la Comunicaci\u00f3n (CInApTIC)" },
+]
+license = { file = "LICENSE" }
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License"
+]
+dependencies = [
+    "greenlet>=3.0.0",
+    "mkdocs",
+    "neurokit2>=0.2.13",
+    "pip",
+    "pyppg>=1.0.14",
+    "python-dotenv",
+    "ruff",
+    "wfdb>=4.3.1",
+]
+requires-python = "==3.14.3"
+
+
+[tool.ruff]
+line-length = 99
+src = ["dimiasa_models"]
+include = ["pyproject.toml", "dimiasa_models/**/*.py"]
+
+[tool.ruff.lint]
+extend-select = ["I"]  # Add import sorting
+
+[tool.ruff.lint.isort]
+known-first-party = ["dimiasa_models"]
+force-sort-within-sections = true
+
