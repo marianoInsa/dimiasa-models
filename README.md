@@ -59,3 +59,60 @@ Analizar los modelos inteligentes y ciencia de datos para usar en los modelos de
 
 --------
 
+## 🚀 Guía de Ejecución
+
+### Prerequisito: datos SisFall
+Descarga el dataset SisFall y coloca los sujetos en `data/raw/sisfall/`.
+Se necesitan al menos 5 sujetos por grupo:
+- Adultos jóvenes: `SA01/`, `SA02/`, `SA03/`, `SA04/`, `SA05/`
+- Adultos mayores: `SE01/`, `SE02/`, `SE03/`, `SE04/`, `SE05/`
+
+### Ejecutar el pipeline (script)
+La forma más directa de correr el pipeline completo (ingest → preprocess → train → evaluate):
+
+```bash
+uv run python main.py
+```
+
+El script carga la configuración desde `FallsConfig` (editable en `dimiasa_models/falls/config.py`),
+entrena el modelo y guarda resultados en `models/falls/` y `reports/figures/falls/`.
+
+### Explorar el pipeline (notebook)
+Para explorar el pipeline paso a paso con visualizaciones intermedias:
+
+```bash
+# Abrir Jupyter y ejecutar el notebook
+uv run jupyter notebook notebooks/01_falls_pipeline.ipynb
+```
+
+### Tests
+El proyecto utiliza `pytest`. Para correr la suite de pruebas:
+
+```bash
+# Tests unitarios e integración (excluye tests lentos que requieren TF fit)
+uv run pytest tests/falls/ -m "not slow" -v
+
+# Todos los tests (incluye entrenamiento real, más lento)
+uv run pytest tests/falls/ -v
+```
+
+--------
+
+## 🐍 Solución a Problemas de Dependencias (Python 3.14+)
+
+Si el comando `uv add` o `uv sync` falla por incompatibilidad de plataforma (ej. TensorFlow no soporta Python 3.14+), debes forzar el uso de una versión aislada compatible ejecutando en tu terminal:
+
+```bash
+# 1. Instalar la versión compatible de Python de forma aislada
+uv python install 3.13
+
+# 2. Recrear el entorno virtual forzando esa versión
+uv venv --python 3.13
+
+# 3. Sincronizar y reinstalar todas las dependencias del proyecto
+uv sync
+```
+
+> Nota: Asegúrate de que el archivo `pyproject.toml` mantenga la restricción establecida en la línea `requires-python = ">=3.10, <3.14"`.
+
+--------
