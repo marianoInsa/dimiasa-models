@@ -16,6 +16,8 @@ classifiers = [
     "License :: OSI Approved :: MIT License"
 ]
 dependencies = [
+    "azure-storage-file-datalake>=12.25.0",
+    "dtaidistance>=2.4.0",
     "greenlet>=3.0.0",
     "matplotlib>=3.9.0",
     "mkdocs",
@@ -23,6 +25,7 @@ dependencies = [
     "numpy>=1.26.0",
     "pandas>=2.2.0",
     "pip",
+    "pyarrow>=25.0.0",
     "pyppg>=1.0.14",
     "pytest>=9.0.3",
     "python-dotenv",
