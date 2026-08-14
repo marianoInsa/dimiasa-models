@@ -1,118 +1,116 @@
-# DiMIASA - Entrenamiento de Modelos
+# DiMIASA — Modelos Inteligentes para Salud y Ambiente
 
-<a target="_blank" href="https://cookiecutter-data-science.drivendata.org/">
-    <img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" />
-</a>
+> **Grupo de investigación:** Centro de Investigación Aplicada en Tecnologías de la Información y la Comunicación (**CInApTIC**)
+> **Institución:** Universidad Tecnológica Nacional, Facultad Regional Resistencia — Departamento de Ingeniería en Sistemas de Información
+> **Proyecto marco:** Diseño de Modelos Inteligentes de IoT Aplicados a Salud y Ambiente (**DiMIASA**)
 
-Analizar los modelos inteligentes y ciencia de datos para usar en los modelos de IoT.
+---
 
-## Project Organization
+## Descripción
+
+Este repositorio contiene los modelos de ciencia de datos e inteligencia artificial desarrollados en el marco del proyecto DiMIASA.
+
+El módulo activo implementa un pipeline de **detección de caídas** a partir de datos de acelerómetro y giroscopio (IMU). Los datos crudos de cuatro datasets públicos se normalizan a 100 Hz y se utilizan para entrenar un modelo **CNN-LSTM** con validación cruzada sujeto-wise.
+
+Los notebooks están diseñados para ejecutarse en **Google Colab**.
+
+---
+
+## Estructura del repositorio
 
 ```
-├── LICENSE            <- Open-source license if one is chosen
-├── Makefile           <- Makefile with convenience commands like `make data` or `make train`
-├── README.md          <- The top-level README for developers using this project.
-├── data
-│   ├── external       <- Data from third party sources.
-│   ├── interim        <- Intermediate data that has been transformed.
-│   ├── processed      <- The final, canonical data sets for modeling.
-│   └── raw            <- The original, immutable data dump.
+├── dimiasa_models/
+│   └── falls/
+│       ├── preprocessing_lib.py   ← ETL: bronce → plata → oro (Azure Data Lake)
+│       └── training_lib.py        ← Entrenamiento CNN-LSTM y evaluación
 │
-├── docs               <- A default mkdocs project; see www.mkdocs.org for details
+├── notebooks/
+│   └── falls/
+│       ├── pipeline/              ← Flujo principal (ejecutar en orden)
+│       │   ├── 00_Preprocesamiento.ipynb
+│       │   └── 01_Entrenamiento.ipynb
+│       └── experiments/           ← Exploración y pruebas
+│           ├── 00-E01-FallAllD-Resampling.ipynb
+│           ├── 01-E01-UMAFall-Resampling.ipynb
+│           ├── 02-E01-SisFall-UPFall-Resampling.ipynb
+│           ├── 03-E02-Resampleo-Unificado.ipynb
+│           ├── 04-E02-Resampleo-Unificado (100 Hz).ipynb
+│           ├── 05-E03-Preparacion-Final.ipynb
+│           └── 06_E03_Preparacion_Final_100Hz.ipynb
 │
-├── models             <- Trained and serialized models, model predictions, or model summaries
-│
-├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
-│                         the creator's initials, and a short `-` delimited description, e.g.
-│                         `1.0-jqp-initial-data-exploration`.
-│
-├── pyproject.toml     <- Project configuration file with package metadata for 
-│                         dimiasa_models and configuration for tools like black
-│
-├── references         <- Data dictionaries, manuals, and all other explanatory materials.
-│
-├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc.
-│   └── figures        <- Generated graphics and figures to be used in reporting
-│
-├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
-│                         generated with `pip freeze > requirements.txt`
-│
-├── setup.cfg          <- Configuration file for flake8
-│
-└── dimiasa_models   <- Source code for use in this project.
-    │
-    ├── __init__.py             <- Makes dimiasa_models a Python module
-    │
-    ├── config.py               <- Store useful variables and configuration
-    │
-    ├── dataset.py              <- Scripts to download or generate data
-    │
-    ├── features.py             <- Code to create features for modeling
-    │
-    ├── modeling                
-    │   ├── __init__.py 
-    │   ├── predict.py          <- Code to run model inference with trained models          
-    │   └── train.py            <- Code to train models
-    │
-    └── plots.py                <- Code to create visualizations
+├── doc/                           ← Documentación, diseños y fuentes
+├── pyproject.toml
+└── AGENTS.md
 ```
 
---------
+---
 
-## 🚀 Guía de Ejecución
+## 🚀 Ejecución en Google Colab
 
-### Prerequisito: datos SisFall
-Descarga el dataset SisFall y coloca los sujetos en `data/raw/sisfall/`.
-Se necesitan al menos 5 sujetos por grupo:
-- Adultos jóvenes: `SA01/`, `SA02/`, `SA03/`, `SA04/`, `SA05/`
-- Adultos mayores: `SE01/`, `SE02/`, `SE03/`, `SE04/`, `SE05/`
+El pipeline se ejecuta en dos pasos en orden:
 
-### Ejecutar el pipeline (script)
-La forma más directa de correr el pipeline completo (ingest → preprocess → train → evaluate):
+| Paso | Notebook | Abrir en Colab |
+|------|----------|----------------|
+| 1 | Preprocesamiento | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/marianoInsa/dimiasa-models/blob/main/notebooks/falls/pipeline/00_Preprocesamiento.ipynb) |
+| 2 | Entrenamiento | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/marianoInsa/dimiasa-models/blob/main/notebooks/falls/pipeline/01_Entrenamiento.ipynb) |
 
-```bash
-uv run python main.py
+La carpeta `experiments/` contiene notebooks de exploración y pruebas utilizados durante el desarrollo del pipeline.
+
+---
+
+## ⚙️ Configuración del entorno
+
+El pipeline lee y escribe datos desde **Azure Data Lake Storage**. Las credenciales deben estar en un archivo `.env` en la raíz del proyecto:
+
+```env
+AZURE_STORAGE_ACCOUNT_NAME=<nombre_de_la_cuenta>
+AZURE_STORAGE_ACCOUNT_KEY=<clave_de_acceso>
 ```
 
-El script carga la configuración desde `FallsConfig` (editable en `dimiasa_models/falls/config.py`),
-entrena el modelo y guarda resultados en `models/falls/` y `reports/figures/falls/`.
+En Google Colab, cargá el archivo `.env` en la sesión o montá Google Drive donde esté almacenado antes de ejecutar las celdas de conexión.
 
-### Explorar el pipeline (notebook)
-Para explorar el pipeline paso a paso con visualizaciones intermedias:
+---
 
-```bash
-# Abrir Jupyter y ejecutar el notebook
-uv run jupyter notebook notebooks/01_falls_pipeline.ipynb
-```
+## 📊 Datasets soportados
 
-### Tests
-El proyecto utiliza `pytest`. Para correr la suite de pruebas:
+| Dataset   | Frecuencia original | Frecuencia normalizada | Señales      |
+|-----------|--------------------|-----------------------|--------------|
+| SisFall   | 200 Hz             | 100 Hz                | Acc + Gyro   |
+| FallAllD  | 238 Hz             | 100 Hz                | Acc + Gyro   |
+| KFall     | 100 Hz             | 100 Hz (sin cambio)   | Acc + Gyro   |
+| UPFall    | 100 Hz             | 100 Hz (sin cambio)   | Acc + Gyro   |
+
+Los datos normalizados se almacenan en la capa **oro** del Data Lake en formato Parquet.
+
+---
+
+## 🧪 Tests
+
+El proyecto utiliza `pytest`. Para correr la suite de pruebas localmente:
 
 ```bash
 # Tests unitarios e integración (excluye tests lentos que requieren TF fit)
-uv run pytest tests/falls/ -m "not slow" -v
+uv run pytest -m "not slow" -v
 
 # Todos los tests (incluye entrenamiento real, más lento)
-uv run pytest tests/falls/ -v
+uv run pytest -v
 ```
 
---------
+---
 
-## 🐍 Solución a Problemas de Dependencias (Python 3.14+)
+## 🐍 Solución a problemas de dependencias (Python 3.14+)
 
-Si el comando `uv add` o `uv sync` falla por incompatibilidad de plataforma (ej. TensorFlow no soporta Python 3.14+), debes forzar el uso de una versión aislada compatible ejecutando en tu terminal:
+Si `uv add` o `uv sync` falla por incompatibilidad de plataforma (TensorFlow no soporta Python 3.14+), forzá el uso de una versión compatible:
 
 ```bash
-# 1. Instalar la versión compatible de Python de forma aislada
+# 1. Instalar Python 3.13 de forma aislada
 uv python install 3.13
 
-# 2. Recrear el entorno virtual forzando esa versión
+# 2. Recrear el entorno virtual con esa versión
 uv venv --python 3.13
 
-# 3. Sincronizar y reinstalar todas las dependencias del proyecto
+# 3. Sincronizar todas las dependencias
 uv sync
 ```
 
-> Nota: Asegúrate de que el archivo `pyproject.toml` mantenga la restricción establecida en la línea `requires-python = ">=3.10, <3.14"`.
-
---------
+> El archivo `pyproject.toml` restringe explícitamente la versión con `requires-python = ">=3.10, <3.14"`.
