@@ -98,6 +98,14 @@ Con el objetivo de facilitar la comparación entre datasets y permitir una evalu
 | 4   | Falling sideward               |
 | 5   | Falling sitting in empty chair |
 
+### UMAFall
+
+| ID | Descripción        |
+| --------------- | ------------------ |
+| backwardFall    | Caída hacia atrás  |
+| forwardFall     | Caída hacia adelante |
+| lateralFall     | Caída lateral      |
+
 ## Taxonomía Unificada
 
 |   ID    | Grupo                                            | Descripción                                                                       |
@@ -159,9 +167,15 @@ Con el objetivo de facilitar la comparación entre datasets y permitir una evalu
 | U9    | 3, 4        |
 | U10   | 1, 2        |
 
+### UMAFall
+
+| Grupo | Actividades                              |
+| ----- | ---------------------------------------- |
+| U9    | backwardFall, forwardFall, lateralFall   |
+
 ## Consideraciones
 
 - La taxonomía se basa en el **mecanismo biomecánico de la caída** y no únicamente en la descripción textual utilizada por cada dataset.
 - Se preservan las etiquetas originales para mantener la trazabilidad entre la taxonomía unificada y los datos de origen.
-- Cuando un dataset proporciona menor nivel de detalle (por ejemplo, UP-Fall), sus etiquetas no se reinterpretan ni se asignan artificialmente a categorías más específicas.
+- Cuando un dataset proporciona menor nivel de detalle (por ejemplo, UP-Fall y UMAFall), sus etiquetas no se reinterpretan ni se asignan artificialmente a categorías más específicas.
 - Esta clasificación constituye una representación común que permite comparar datasets heterogéneos y analizar posteriormente el impacto que tiene cada uno sobre el rendimiento del modelo de detección de caídas.
