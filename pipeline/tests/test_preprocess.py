@@ -1,6 +1,15 @@
 import numpy as np
 import pandas as pd
-from pipeline.preprocess import resample_trial_df, SCHEMA_COLS, saturation_report, check_sanity, fit_normalizer, apply_normalizer, outlier_report
+from pipeline.preprocess import (
+    resample_trial_df,
+    SCHEMA_COLS,
+    saturation_report,
+    check_sanity,
+    fit_normalizer,
+    apply_normalizer,
+    outlier_report,
+    filter_valid_trials,
+)
 
 
 def test_schema_and_resample():
@@ -73,3 +82,22 @@ def test_outlier_counts():
     r = outlier_report(df, ["Ax"])
     assert r["Ax"]["n_outliers"] == 100
     assert r["Ax"]["bounds"][1] < 100.0
+
+
+def test_and_discard():
+    # Solo 1 métrica falla (pearson_r) -> política AND>=2 NO descarta.
+    m = pd.DataFrame({"Subject":[1],"Activity_Code":[1],"Trial":[1],
+        "pearson_r":[0.5],"phase_shift_ms":[5.0],"peak_atten_pct":[3.0]})
+    raw = pd.DataFrame({"Subject":[1],"Activity_Label":["Fall"],"Activity_Code":[1],"Trial":[1]})
+    ids, nv, nd = filter_valid_trials(raw, m)  # solo 1 falla -> AND no descarta
+    assert nd == 0 and nv == 1
+
+
+def test_and_discard_two():
+    # 2 métricas fallan (pearson_r y phase_shift_ms) -> descarta.
+    m = pd.DataFrame({"Subject":[1],"Activity_Code":[1],"Trial":[1],
+        "pearson_r":[0.5],"phase_shift_ms":[500.0],"peak_atten_pct":[3.0]})
+    raw = pd.DataFrame({"Subject":[1],"Activity_Label":["Fall"],"Activity_Code":[1],"Trial":[1]})
+    ids, nv, nd = filter_valid_trials(raw, m)  # 2 fallan -> descarta
+    assert nd == 1 and nv == 0
+

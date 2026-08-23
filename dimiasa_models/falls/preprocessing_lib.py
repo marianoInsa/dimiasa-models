@@ -14,7 +14,6 @@ import numpy as np
 import pandas as pd
 from scipy.signal import resample_poly, butter, filtfilt
 from scipy.stats import pearsonr
-from dtaidistance import dtw as dtw_lib
 
 # --- Constantes Globales por Defecto -------------------------------------------
 FS_TARGET = 100
@@ -78,7 +77,8 @@ def resample_signal(
 ) -> np.ndarray:
     """Resamplea un vector 1D usando resample_poly y ventana Kaiser."""
     up, down = get_poly_factors(fs_orig, fs_target)
-    return resample_poly(signal, up=up, down=down, window=("kaiser", kaiser_beta))
+    # padtype="line" reduce el efecto de borde en los extremos del resampleo.
+    return resample_poly(signal, up=up, down=down, window=("kaiser", kaiser_beta), padtype="line")
 
 
 def resample_trial_df(
@@ -184,33 +184,6 @@ def pearson_inband(
     return float(r)
 
 
-def dtw_normalized(
-    orig: np.ndarray,
-    resampled: np.ndarray,
-    fs_orig: int,
-    fs_target: int = FS_TARGET,
-    kaiser_beta: float = KAISER_BETA,
-) -> float:
-    """Distancia DTW normalizada entre original resampleada y señal resampleada."""
-    up, down = get_poly_factors(fs_orig, fs_target)
-    orig_resample = resample_poly(
-        orig, up=up, down=down, window=("kaiser", kaiser_beta)
-    )
-
-    def zscore(x):
-        s = x.std()
-        return (x - x.mean()) / s if s > 0 else x - x.mean()
-
-    a = zscore(orig_resample).astype(np.double)
-    b = zscore(resampled).astype(np.double)
-    max_len = 500
-    if len(a) > max_len:
-        a = a[:max_len]
-        b = b[:max_len]
-    dist = dtw_lib.distance_fast(a, b)
-    return float(dist / max(len(a), len(b)))
-
-
 def peak_phase_shift_ms(
     orig: np.ndarray,
     resampled: np.ndarray,
@@ -283,7 +256,6 @@ def analyze_trial(
         result[sensor] = {
             "snr_db": snr_inband(orig, resampled, fs_orig, fs_target),
             "pearson_r": pearson_inband(orig, resampled, fs_orig, fs_target),
-            "dtw_norm": dtw_normalized(orig, resampled, fs_orig, fs_target, kaiser_beta),
             "phase_shift_ms": peak_phase_shift_ms(orig, resampled, fs_orig, fs_target),
             "peak_atten_pct": peak_attenuation_pct(orig, resampled, fs_orig, fs_target),
         }
@@ -380,12 +352,14 @@ def filter_valid_trials(
         acc_metrics, on=["Subject", "Activity_Code", "Trial"], how="left"
     )
 
-    discard_mask = (
-        merged["pearson_r"].isna()
-        | (merged["pearson_r"] < pearson_min)
-        | (merged["phase_shift_ms"] > phase_ms_max)
-        | (merged["peak_atten_pct"] > atten_pct_max)
+    # Política AND>=2: un trial se descarta solo si al menos 2 de las 3 métricas
+    # fallan. Los NaN de métricas (= trial corto/no evaluable) se descartan aparte.
+    weak = (
+        (merged["pearson_r"] < pearson_min).astype(int)
+        + (merged["phase_shift_ms"] > phase_ms_max).astype(int)
+        + (merged["peak_atten_pct"] > atten_pct_max).astype(int)
     )
+    discard_mask = merged["pearson_r"].isna() | (weak >= 2)
 
     valid_ids = merged.loc[
         ~discard_mask, ["Subject", "Activity_Code", "Trial"]

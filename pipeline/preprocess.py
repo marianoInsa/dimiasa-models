@@ -84,7 +84,8 @@ def resample_signal(
 ) -> np.ndarray:
     """Resamplea un vector 1D usando resample_poly y ventana Kaiser."""
     up, down = get_poly_factors(fs_orig, fs_target)
-    return resample_poly(signal, up=up, down=down, window=("kaiser", kaiser_beta))
+    # padtype="line" reduce el efecto de borde en los extremos del resampleo.
+    return resample_poly(signal, up=up, down=down, window=("kaiser", kaiser_beta), padtype="line")
 
 
 def resample_trial_df(
@@ -161,3 +162,57 @@ def outlier_report(df: pd.DataFrame, cols: list[str], method: str = "iqr") -> di
             "bounds": [float(lo), float(hi)],
         }
     return rep
+
+
+# Umbrales de descarte de calidad de resampleo (lógica OR→AND, Task 6).
+THR_PEARSON_MIN = 0.85
+THR_PHASE_MS_MAX = 100.0
+THR_ATTEN_PCT_MAX = 25.0
+
+
+def filter_valid_trials(
+    df_raw: pd.DataFrame,
+    df_metrics: pd.DataFrame,
+    pearson_min: float = THR_PEARSON_MIN,
+    phase_ms_max: float = THR_PHASE_MS_MAX,
+    atten_pct_max: float = THR_ATTEN_PCT_MAX,
+) -> tuple[list, int, int]:
+    """
+    Cruza trials de clase Fall con sus métricas de fidelidad y filtra los que
+    no cumplen los umbrales de calidad.
+
+    Política AND>=2: un trial se descarta solo si al menos 2 de las 3 métricas
+    fallan (pearson_r, phase_shift_ms, peak_atten_pct). Los trials cortos dejan
+    métricas NaN (no evaluables) y se cuentan aparte como descarte.
+    """
+    falls = df_raw[df_raw["Activity_Label"] == "Fall"]
+    trial_ids = (
+        falls[["Subject", "Activity_Code", "Trial"]]
+        .drop_duplicates()
+        .reset_index(drop=True)
+    )
+
+    acc_metrics = df_metrics[
+        ["Subject", "Activity_Code", "Trial", "pearson_r", "phase_shift_ms", "peak_atten_pct"]
+    ]
+
+    merged = trial_ids.merge(
+        acc_metrics, on=["Subject", "Activity_Code", "Trial"], how="left"
+    )
+
+    # Cuenta de fallos: >=2 de 3 métricas malas -> descarte.
+    weak = (
+        (merged["pearson_r"] < pearson_min).astype(int)
+        + (merged["phase_shift_ms"] > phase_ms_max).astype(int)
+        + (merged["peak_atten_pct"] > atten_pct_max).astype(int)
+    )
+    # NaN de métricas = trial corto/no evaluable -> descarte directo.
+    discard_mask = merged["pearson_r"].isna() | (weak >= 2)
+
+    valid_ids = merged.loc[
+        ~discard_mask, ["Subject", "Activity_Code", "Trial"]
+    ].values.tolist()
+    n_valid = len(valid_ids)
+    n_discarded = int(discard_mask.sum())
+
+    return valid_ids, n_valid, n_discarded
