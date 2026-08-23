@@ -116,3 +116,20 @@ def resample_trial_df(
     out["Sample_Index"] = np.arange(len(out))
 
     return out[schema_cols]
+
+
+# Z-score normalizador (paper §4.3). El fit de µ/σ se hace SOLO en train para
+# evitar leakage; NO se aplica en el oro.
+# ponytail: sigma 0 -> 1.0 para evitar división por cero.
+def fit_normalizer(train_df: pd.DataFrame, cols: list[str]) -> dict:
+    return {
+        "mu": {c: float(train_df[c].mean()) for c in cols},
+        "sigma": {c: (float(train_df[c].std()) or 1.0) for c in cols},
+    }
+
+
+def apply_normalizer(df: pd.DataFrame, stats: dict, cols: list[str]) -> pd.DataFrame:
+    out = df.copy()
+    for c in cols:
+        out[c] = (out[c] - stats["mu"][c]) / stats["sigma"][c]
+    return out

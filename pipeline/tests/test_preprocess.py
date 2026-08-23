@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from pipeline.preprocess import resample_trial_df, SCHEMA_COLS, saturation_report, check_sanity
+from pipeline.preprocess import resample_trial_df, SCHEMA_COLS, saturation_report, check_sanity, fit_normalizer, apply_normalizer
 
 
 def test_schema_and_resample():
@@ -49,3 +49,18 @@ def test_check_sanity_basic():
     })
     r = check_sanity(df, "SisFall")
     assert r["nan"] == 0 and r["dead_channels"] == [] and abs(r["avm_median_g"] - 1.0) < 1e-9
+
+
+def test_normalizer_zero_mean_unit_std():
+    rng = np.random.default_rng(0)
+    df = pd.DataFrame({"Ax": rng.normal(5.0, 3.0, 2000)})
+    st = fit_normalizer(df, ["Ax"])
+    out = apply_normalizer(df, st, ["Ax"])
+    assert abs(out["Ax"].mean()) < 1e-9
+    assert abs(out["Ax"].std() - 1.0) < 1e-9
+
+
+def test_normalizer_sigma_guard():
+    df = pd.DataFrame({"Ax": [1.0] * 10})
+    st = fit_normalizer(df, ["Ax"])
+    assert st["sigma"]["Ax"] == 1.0  # evita división por cero
