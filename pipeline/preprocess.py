@@ -133,3 +133,31 @@ def apply_normalizer(df: pd.DataFrame, stats: dict, cols: list[str]) -> pd.DataF
     for c in cols:
         out[c] = (out[c] - stats["mu"][c]) / stats["sigma"][c]
     return out
+
+
+# Umbrales de outlier documentados como constantes (ver memory/OUTLIERS.md).
+# El IQR usa 1.5; el z-score usa 3 sigma. Los outliers de caída se tratan como
+# impactos reales (no ruido) y NO se eliminan.
+IQR_K = 1.5
+Z_K = 3.0
+
+
+def outlier_report(df: pd.DataFrame, cols: list[str], method: str = "iqr") -> dict:
+    """Conteo de outliers por canal para EDA. method: 'iqr' o 'z'."""
+    rep: dict = {}
+    for c in cols:
+        x = df[c].astype(float)
+        if method == "iqr":
+            q1, q3 = x.quantile(0.25), x.quantile(0.75)
+            iqr = q3 - q1
+            lo, hi = q1 - IQR_K * iqr, q3 + IQR_K * iqr
+        else:  # 'z'
+            mu, sd = x.mean(), x.std()
+            lo, hi = mu - Z_K * sd, mu + Z_K * sd
+        mask = (x < lo) | (x > hi)
+        rep[c] = {
+            "n_outliers": int(mask.sum()),
+            "frac": float(mask.mean()),
+            "bounds": [float(lo), float(hi)],
+        }
+    return rep

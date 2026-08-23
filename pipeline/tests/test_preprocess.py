@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from pipeline.preprocess import resample_trial_df, SCHEMA_COLS, saturation_report, check_sanity, fit_normalizer, apply_normalizer
+from pipeline.preprocess import resample_trial_df, SCHEMA_COLS, saturation_report, check_sanity, fit_normalizer, apply_normalizer, outlier_report
 
 
 def test_schema_and_resample():
@@ -64,3 +64,12 @@ def test_normalizer_sigma_guard():
     df = pd.DataFrame({"Ax": [1.0] * 10})
     st = fit_normalizer(df, ["Ax"])
     assert st["sigma"]["Ax"] == 1.0  # evita división por cero
+
+
+def test_outlier_counts():
+    # Inliers acotados en [-2,2]; los 100 valores de 100.0 son los únicos outliers.
+    s = np.concatenate([np.random.default_rng(0).uniform(-2, 2, 900), [100.0] * 100])
+    df = pd.DataFrame({"Ax": s})
+    r = outlier_report(df, ["Ax"])
+    assert r["Ax"]["n_outliers"] == 100
+    assert r["Ax"]["bounds"][1] < 100.0
