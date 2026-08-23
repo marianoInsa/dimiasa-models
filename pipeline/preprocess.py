@@ -35,6 +35,38 @@ DATASETS_META = {
     "UMAFall": {"fs": 200, "csv": "UMAFall-Reduced.csv"},
 }
 
+# Full-scale ranges (g / °/s) por dataset según paper jpm-15-00210-v2 §4.1.3 y
+# corrección de ingeniería: UMAFall usa ±8g / ±256°/s, el resto ±16g / ±2000°/s.
+ACC_FS = {"SisFall": 16, "FallAllD": 16, "UMAFall": 8, "UPFall": 16, "KFall": 16}
+GYRO_FS = {"SisFall": 2000, "FallAllD": 2000, "UMAFall": 256, "UPFall": 2000, "KFall": 2000}
+
+
+def _sat(df: pd.DataFrame, cols: list[str], fs: float) -> dict:
+    """Fracción de muestras por canal en el 99% superior del rango full-scale."""
+    return {f"{c}_sat_frac": float((df[c].abs() >= 0.99 * fs).mean()) for c in cols}
+
+
+def saturation_report(df: pd.DataFrame, ds_name: str) -> dict:
+    """Fracciones de saturación/clipping por diferencia de full-scale."""
+    return {
+        **_sat(df, ["Ax", "Ay", "Az"], ACC_FS[ds_name]),
+        **_sat(df, ["Gx", "Gy", "Gz"], GYRO_FS[ds_name]),
+    }
+
+
+def check_sanity(df: pd.DataFrame, ds_name: str) -> dict:
+    """Auditoría de unidades físicas: NaNs, gravedad, canales muertos y saturación."""
+    nan = int(df[SENSOR_COLS].isna().sum().sum())
+    avm = np.sqrt(df["Ax"] ** 2 + df["Ay"] ** 2 + df["Az"] ** 2)
+    avm_median_g = float(avm.median())
+    dead_channels = [c for c in SENSOR_COLS if df[c].std() == 0]
+    return {
+        "nan": nan,
+        "avm_median_g": avm_median_g,
+        "dead_channels": dead_channels,
+        **saturation_report(df, ds_name),
+    }
+
 
 def get_poly_factors(fs_orig: int, fs_target: int = FS_TARGET) -> tuple[int, int]:
     """Devuelve (up, down) reducidos al mínimo común divisor."""
