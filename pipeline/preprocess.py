@@ -32,7 +32,7 @@ DATASETS_META = {
     "KFall": {"fs": 100, "csv": "KFall-Reduced.csv"},
     "FallAllD": {"fs": 238, "csv": "FallAllD-Reduced.csv"},
     "SisFall": {"fs": 200, "csv": "SisFall-Reduced.csv"},
-    "UMAFall": {"fs": 200, "csv": "UMAFall-Reduced.csv"},
+    "UMAFall": {"fs": 20, "csv": "UMAFall-Reduced.csv"},
 }
 
 # Full-scale ranges (g / °/s) por dataset según paper jpm-15-00210-v2 §4.1.3 y
