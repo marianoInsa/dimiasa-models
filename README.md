@@ -21,7 +21,6 @@ Los notebooks están diseñados para ejecutarse en **Google Colab**.
 ```
 ├── dimiasa_models/
 │   └── falls/
-│       ├── preprocessing_lib.py   ← ETL: bronce → plata → oro (Azure Data Lake)
 │       └── training_lib.py        ← Entrenamiento CNN-LSTM y evaluación
 │
 ├── notebooks/

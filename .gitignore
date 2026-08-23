@@ -1,6 +1,11 @@
 # Data
 /data/
 
+# Local project memory, plans, and raw datasets (no remote push)
+/memory/
+/docs/superpowers/plans/
+/datasets/
+
 # Mac OS-specific storage files
 .DS_Store
 
