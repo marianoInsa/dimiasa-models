@@ -10,6 +10,32 @@ Con el objetivo de facilitar la comparación entre datasets y permitir una evalu
 
 ### SisFall
 
+#### Actividades de la vida diaria (ADL):
+
+| ID  | Descripción                                                                             |
+| --- | --------------------------------------------------------------------------------------- |
+| D01 | Walking slowly                                                                          |
+| D02 | Walking quickly                                                                         |
+| D03 | Jogging slowly                                                                          |
+| D04 | Jogging quickly                                                                         |
+| D05 | Walking upstairs and downstairs slowly                                                  |
+| D06 | Walking upstairs and downstairs quickly                                                 |
+| D07 | Slowly sit in a half height chair, wait a moment, and up slowly                         |
+| D08 | Quickly sit in a half height chair, wait a moment, and up quickly                       |
+| D09 | Slowly sit in a low height chair, wait a moment, and up slowly                          |
+| D10 | Quickly sit in a low height chair, wait a moment, and up quickly                        |
+| D11 | Sitting a moment, trying to get up, and collapse into a chair                           |
+| D12 | Sitting a moment, lying slowly, wait a moment, and sit again                            |
+| D13 | Sitting a moment, lying quickly, wait a moment, and sit again                           |
+| D14 | Being on one's back change to lateral position, wait a moment, and change to one's back |
+| D15 | Standing, slowly bending at knees, and getting up                                       |
+| D16 | Standing, slowly bending without bending knees, and getting up                          |
+| D17 | Standing, get into a car, remain seated and get out of the car                          |
+| D18 | Stumble while walking                                                                   |
+| D19 | Gently jump without falling (trying to reach a high object)                             |
+
+#### Caídas:
+
 | ID  | Descripción                                                                         |
 | --- | ----------------------------------------------------------------------------------- |
 | F01 | Fall forward while walking caused by a slip                                         |
@@ -30,25 +56,104 @@ Con el objetivo de facilitar la comparación entre datasets y permitir una evalu
 
 ### KFall
 
-| ID  | Descripción                                                              |
-| --- | ------------------------------------------------------------------------ |
-| T20 | Forward fall when trying to sit down                                     |
-| T21 | Backward fall when trying to sit down                                    |
-| T22 | Lateral fall when trying to sit down                                     |
-| T23 | Forward fall when trying to get up                                       |
-| T24 | Lateral fall when trying to get up                                       |
-| T25 | Forward fall while sitting, caused by fainting                           |
-| T26 | Lateral fall while sitting, caused by fainting                           |
-| T27 | Backward fall while sitting, caused by fainting                          |
-| T28 | Vertical (forward) fall while walking caused by fainting                 |
-| T29 | Fall while walking, with use of hands to dampen fall, caused by fainting |
-| T30 | Forward fall while walking caused by a trip                              |
-| T31 | Forward fall while jogging caused by a trip                              |
-| T32 | Forward fall while walking caused by a slip                              |
-| T33 | Lateral fall while walking caused by a slip                              |
-| T34 | Backward fall while walking caused by a slip                             |
+#### Actividades de la vida diaria (ADL):
+
+| ID  | Descripción                                                                             |
+| --- | --------------------------------------------------------------------------------------- |
+| D01 | Stand for 30 s                                                                          |
+| D02 | Stand, slowly bend the back with or without bending at knees, tie shoe lace, and get up |
+| D03 | Pick up an object from the floor                                                        |
+| D04 | Gently jump (try to reach an object)                                                    |
+| D05 | Stand, sit to the ground, wait a moment, and get up with normal speed                   |
+| D06 | Walk normally with turn (4 m)                                                           |
+| D07 | Walk quickly with turn (4 m)                                                            |
+| D08 | Jog normally with turn (4 m)                                                            |
+| D09 | Jog quickly with turn (4 m)                                                             |
+| D10 | Stumble while walking                                                                   |
+| D11 | Sit on a chair for 30 s                                                                 |
+| D12 | Sit on the sofa (back is inclined to the support) for 30 s                              |
+| D13 | Sit down to a chair normally, and get up from a chair normally                          |
+| D14 | Sit down to a chair quickly, and get up from a chair quickly                            |
+| D15 | Sit a moment, trying to get up, and collapse into a chair                               |
+| D16 | Stand, sit on the sofa (back is inclined to the support), and get up normally           |
+| D17 | Lie on the bed for 30 s                                                                 |
+| D18 | Sit a moment, lie down to the bed normally, and get up normally                         |
+| D19 | Sit a moment, lie down to the bed quickly, and get up quickly                           |
+| D20 | Walk upstairs and downstairs normally (five steps)                                      |
+| D21 | Walk upstairs and downstairs quickly (five steps)                                       |
+
+#### Caídas:
+
+| ID  | Task crudo | Descripción                                                         |
+| --- | ---------- | ------------------------------------------------------------------- |
+| F01 | T20        | Forward fall when trying to sit down                                |
+| F02 | T21        | Backward fall when trying to sit down                               |
+| F03 | T22        | Lateral fall when trying to sit down                                |
+| F04 | T23        | Forward fall when trying to get up                                  |
+| F05 | T24        | Lateral fall when trying to get up                                  |
+| F06 | T25        | Forward fall while sitting, caused by fainting                      |
+| F07 | T26        | Lateral fall while sitting, caused by fainting                      |
+| F08 | T27        | Backward fall while sitting, caused by fainting                     |
+| F09 | T28        | Vertical (forward) fall while walking caused by fainting            |
+| F10 | T29        | Fall while walking, use of hands to dampen fall, caused by fainting |
+| F11 | T30        | Forward fall while walking caused by a trip                         |
+| F12 | T31        | Forward fall while jogging caused by a trip                         |
+| F13 | T32        | Forward fall while walking caused by a slip                         |
+| F14 | T33        | Lateral fall while walking caused by a slip                         |
+| F15 | T34        | Backward fall while walking caused by a slip                        |
 
 ### FallAllD
+
+#### Actividades de la vida diaria (ADL):
+
+| ID   | Descripción                                                             |
+| ---- | ----------------------------------------------------------------------- |
+| A001 | Start clapping hands                                                    |
+| A002 | Clapping hands                                                          |
+| A003 | Stop clapping hands                                                     |
+| A004 | Clap hands one time                                                     |
+| A005 | Start waving hands                                                      |
+| A006 | Waving hands                                                            |
+| A007 | Stop waving hands                                                       |
+| A008 | Raising hand up                                                         |
+| A009 | Moving hand down                                                        |
+| A010 | Moving hand up then down immediately                                    |
+| A011 | Hand shaking                                                            |
+| A012 | Beating a table with your hand                                          |
+| A013 | Sitting down                                                            |
+| A014 | Standing up                                                             |
+| A015 | Fail to stand up from a sofa/chair (after half standing)                |
+| A016 | Lying down on a bed                                                     |
+| A017 | Changing position (turning) in the bed                                  |
+| A018 | Rising up from a bed                                                    |
+| A019 | Start walking                                                           |
+| A020 | Walking slowly or in moderate speed                                     |
+| A021 | Stop walking                                                            |
+| A022 | Walking quickly                                                         |
+| A023 | Stumbling while walking without falling                                 |
+| A024 | Jogging slowly                                                          |
+| A025 | Jogging quickly                                                         |
+| A026 | Jumping slightly                                                        |
+| A027 | Jumping strongly                                                        |
+| A028 | Bending down (e.g. to pick something up from floor) and then raising up |
+| A029 | Start going upstairs                                                    |
+| A030 | Going upstairs                                                          |
+| A031 | Stop going upstairs                                                     |
+| A032 | Start going downstairs                                                  |
+| A033 | Going downstairs                                                        |
+| A034 | Stop going downstairs                                                   |
+| A035 | Going upstairs quickly                                                  |
+| A036 | Going downstairs quickly                                                |
+| A037 | Start ascending using a lift                                            |
+| A038 | Stop ascending using a lift                                             |
+| A039 | Start descending using a lift                                           |
+| A040 | Stop descending using a lift                                            |
+| A041 | Standing in a moving bus/metro                                          |
+| A042 | Sitting in a moving bus/metro                                           |
+| A043 | Start jogging                                                           |
+| A044 | Stop jogging                                                            |
+
+#### Caídas:
 
 | ID   | Descripción                                                                                                 |
 | ---- | ----------------------------------------------------------------------------------------------------------- |
@@ -90,6 +195,19 @@ Con el objetivo de facilitar la comparación entre datasets y permitir una evalu
 
 ### UPFall
 
+#### Actividades de la vida diaria (ADL):
+
+| ID  | Descripción          |
+| --- | -------------------- |
+| 6   | Walking              |
+| 7   | Standing             |
+| 8   | Sitting              |
+| 9   | Picking up an object |
+| 10  | Jumping              |
+| 11  | Laying               |
+
+#### Caídas:
+
 | ID  | Descripción                    |
 | --- | ------------------------------ |
 | 1   | Falling forward using hands    |
@@ -97,6 +215,33 @@ Con el objetivo de facilitar la comparación entre datasets y permitir una evalu
 | 3   | Falling backwards              |
 | 4   | Falling sideward               |
 | 5   | Falling sitting in empty chair |
+
+### UMAFall
+
+#### Actividades de la vida diaria (ADL):
+
+| ID                        | Descripción                                 |
+| ------------------------- | ------------------------------------------- |
+| Walking                   | Walking                                     |
+| Jogging                   | Jogging                                     |
+| Hopping                   | Hopping on one leg                          |
+| Bending                   | Bending down and raising up                 |
+| GoUpstairs                | Climbing stairs (up)                        |
+| GoDownstairs              | Climbing stairs (down)                      |
+| Sitting_GettingUpOnAChair | Sitting down on and getting up from a chair |
+| LyingDown_OnABed          | Lying down and getting up from a bed        |
+| MakingACall               | Making a phone call                         |
+| OpeningDoor               | Opening a door                              |
+| HandsUp                   | Raising hands up                            |
+| Aplausing                 | Applauding                                  |
+
+#### Caídas:
+
+| ID           | Descripción   |
+| ------------ | ------------- |
+| forwardFall  | Forward fall  |
+| backwardFall | Backward fall |
+| lateralFall  | Lateral fall  |
 
 ## Taxonomía Unificada
 
@@ -129,27 +274,27 @@ Con el objetivo de facilitar la comparación entre datasets y permitir una evalu
 
 ### KFall
 
-| Grupo | Actividades                  |
-| ----- | ---------------------------- |
-| U1    | T32, T33, T34                |
-| U2    | T30                          |
-| U3    | T31                          |
-| U4    | T28, T29                     |
-| U5    | T20, T21, T22                |
-| U6    | T23, T24                     |
-| U7    | T25, T26, T27                |
+| Grupo | Actividades   |
+| ----- | ------------- |
+| U1    | F13, F14, F15 |
+| U2    | F11           |
+| U3    | F12           |
+| U4    | F09, F10      |
+| U5    | F01, F02, F03 |
+| U6    | F04, F05      |
+| U7    | F06, F07, F08 |
 
 ### FallAllD
 
-| Grupo | Actividades                                                                                       |
-| ----- | ------------------------------------------------------------------------------------------------- |
-| U1    | A103, A104, A105, A106, A107, A108, A109, A110                                                   |
-| U2    | A101, A102                                                                                       |
-| U3    | A121, A122, A123, A124, A125, A126                                                               |
-| U4    | A111, A112, A113, A114, A132, A133, A134, A135                                                   |
-| U5    | A115, A116, A117, A118, A119, A120                                                               |
-| U7    | A129, A130, A131                                                                                 |
-| U8    | A127, A128                                                                                       |
+| Grupo | Actividades                                    |
+| ----- | ---------------------------------------------- |
+| U1    | A103, A104, A105, A106, A107, A108, A109, A110 |
+| U2    | A101, A102                                     |
+| U3    | A121, A122, A123, A124, A125, A126             |
+| U4    | A111, A112, A113, A114, A132, A133, A134, A135 |
+| U5    | A115, A116, A117, A118, A119, A120             |
+| U7    | A129, A130, A131                               |
+| U8    | A127, A128                                     |
 
 ### UPFall
 
@@ -159,9 +304,16 @@ Con el objetivo de facilitar la comparación entre datasets y permitir una evalu
 | U9    | 3, 4        |
 | U10   | 1, 2        |
 
+### UMAFall
+
+| Grupo | Actividades                            |
+| ----- | -------------------------------------- |
+| U9    | forwardFall, backwardFall, lateralFall |
+
 ## Consideraciones
 
 - La taxonomía se basa en el **mecanismo biomecánico de la caída** y no únicamente en la descripción textual utilizada por cada dataset.
 - Se preservan las etiquetas originales para mantener la trazabilidad entre la taxonomía unificada y los datos de origen.
-- Cuando un dataset proporciona menor nivel de detalle (por ejemplo, UP-Fall), sus etiquetas no se reinterpretan ni se asignan artificialmente a categorías más específicas.
+- Cuando un dataset proporciona menor nivel de detalle (por ejemplo, UP-Fall o UMAFall), sus etiquetas no se reinterpretan ni se asignan artificialmente a categorías más específicas.
+- Las tablas incluyen también las ADL de cada dataset (códigos oficiales verificados contra su documentación y datos crudos), pero los grupos U1–U10 solo clasifican caídas; las ADL quedan fuera de la taxonomía de caídas.
 - Esta clasificación constituye una representación común que permite comparar datasets heterogéneos y analizar posteriormente el impacto que tiene cada uno sobre el rendimiento del modelo de detección de caídas.

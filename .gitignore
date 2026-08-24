@@ -5,6 +5,7 @@
 /memory/
 /docs/superpowers/plans/
 /datasets/
+notebooks/data
 
 # Mac OS-specific storage files
 .DS_Store

@@ -10,32 +10,22 @@
 
 Este repositorio contiene los modelos de ciencia de datos e inteligencia artificial desarrollados en el marco del proyecto DiMIASA.
 
-El módulo activo implementa un pipeline de **detección de caídas** a partir de datos de acelerómetro y giroscopio (IMU). Los datos crudos de cuatro datasets públicos se normalizan a 100 Hz y se utilizan para entrenar un modelo **CNN-LSTM** con validación cruzada sujeto-wise.
-
-Los notebooks están diseñados para ejecutarse en **Google Colab**.
+El módulo activo implementa un pipeline de **detección de caídas** a partir de datos de acelerómetro y giroscopio (IMU). Los datos crudos de cinco datasets públicos se normalizan a 50 Hz y se utilizan para entrenar un modelo **CNN-LSTM** con validación cruzada sujeto-wise.
 
 ---
 
 ## Estructura del repositorio
 
 ```
-├── dimiasa_models/
-│   └── falls/
-│       └── training_lib.py        ← Entrenamiento CNN-LSTM y evaluación
-│
 ├── notebooks/
-│   └── falls/
-│       ├── pipeline/              ← Flujo principal (ejecutar en orden)
-│       │   ├── 00_Preprocesamiento.ipynb
-│       │   └── 01_Entrenamiento.ipynb
-│       └── experiments/           ← Exploración y pruebas
-│           ├── 00-E01-FallAllD-Resampling.ipynb
-│           ├── 01-E01-UMAFall-Resampling.ipynb
-│           ├── 02-E01-SisFall-UPFall-Resampling.ipynb
-│           ├── 03-E02-Resampleo-Unificado.ipynb
-│           ├── 04-E02-Resampleo-Unificado (100 Hz).ipynb
-│           ├── 05-E03-Preparacion-Final.ipynb
-│           └── 06_E03_Preparacion_Final_100Hz.ipynb
+│    ├── pipeline/              ← Flujo principal (ejecutar en orden)
+│    │   ├── 00_Preprocesamiento.ipynb
+│    │   └── 01_Entrenamiento.ipynb
+│    ├── experiments/           ← Exploración y pruebas
+|    └── data/                  ← Arquitectura de datos
+|        ├── bronce/falls       ← Datos crudos
+|        ├── plata/falls        ← Métricas
+|        └── oro/falls          ← Datos maduros para entrenamiento
 │
 ├── doc/                           ← Documentación, diseños y fuentes
 ├── pyproject.toml
@@ -44,42 +34,58 @@ Los notebooks están diseñados para ejecutarse en **Google Colab**.
 
 ---
 
-## 🚀 Ejecución en Google Colab
-
-El pipeline se ejecuta en dos pasos en orden:
-
-| Paso | Notebook | Abrir en Colab |
-|------|----------|----------------|
-| 1 | Preprocesamiento | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/marianoInsa/dimiasa-models/blob/main/notebooks/falls/pipeline/00_Preprocesamiento.ipynb) |
-| 2 | Entrenamiento | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/marianoInsa/dimiasa-models/blob/main/notebooks/falls/pipeline/01_Entrenamiento.ipynb) |
-
-La carpeta `experiments/` contiene notebooks de exploración y pruebas utilizados durante el desarrollo del pipeline.
-
----
-
-## ⚙️ Configuración del entorno
-
-El pipeline lee y escribe datos desde **Azure Data Lake Storage**. Las credenciales deben estar en un archivo `.env` en la raíz del proyecto:
-
-```env
-AZURE_STORAGE_ACCOUNT_NAME=<nombre_de_la_cuenta>
-AZURE_STORAGE_ACCOUNT_KEY=<clave_de_acceso>
-```
-
-En Google Colab, cargá el archivo `.env` en la sesión o montá Google Drive donde esté almacenado antes de ejecutar las celdas de conexión.
-
----
-
 ## 📊 Datasets soportados
 
-| Dataset   | Frecuencia original | Frecuencia normalizada | Señales      |
-|-----------|--------------------|-----------------------|--------------|
-| SisFall   | 200 Hz             | 100 Hz                | Acc + Gyro   |
-| FallAllD  | 238 Hz             | 100 Hz                | Acc + Gyro   |
-| KFall     | 100 Hz             | 100 Hz (sin cambio)   | Acc + Gyro   |
-| UPFall    | 100 Hz             | 100 Hz (sin cambio)   | Acc + Gyro   |
+| Dataset  | Frecuencia original | Frecuencia normalizada | Señales    | Filas a 50 Hz |
+| -------- | ------------------- | ---------------------- | ---------- | ------------- |
+| SisFall  | 200 Hz              | 50 Hz                  | Acc + Gyro | 3,962,612     |
+| FallAllD | 238 Hz              | 50 Hz                  | Acc + Gyro | 1,792,000     |
+| KFall    | 100 Hz              | 50 Hz                  | Acc + Gyro | 1,998,789     |
+| UPFall   | 100 Hz              | 50 Hz                  | Acc + Gyro | 147,295       |
+| UMAFall  | 20 Hz               | 50 Hz                  | Acc + Gyro | 408,882       |
 
-Los datos normalizados se almacenan en la capa **oro** del Data Lake en formato Parquet.
+---
+
+## 🧹 Preprocesamiento (`00_Preprocesamiento.ipynb`)
+
+Pipeline ETL que normaliza los datos crudos a **50 Hz** con esquema estándar de 14 columnas. Organizado en tres capas de almacenamiento:
+
+- **`bronce/falls`**: CSVs crudos e inmutables de los datasets.
+- **`plata/falls`**: métricas de calidad por trial y configuraciones JSON de filtrado.
+- **`oro/falls`**: datos finales en Parquet a 50 Hz.
+
+### Pasos del proceso
+
+1. **Ingesta** — lee los CSVs desde `bronce`.
+2. **Auditoría de unidades físicas** — valida NaN, mediana de AVM ≈ 1 g, canales muertos y saturación por full-scale.
+3. **Validación de etiquetas** — verifica que solo existan `Fall`/`ADL` sin mezcla en un trial; reporta la distribución por dataset.
+4. **Métricas de fidelidad por trial** (sobre **AVM y GVM**) — compara cada trial original contra su versión resampleada a 50 Hz:
+   - SNR en banda útil (dB)
+   - Correlación de Pearson
+   - Desfase del pico (ms)
+   - Atenuación del pico (%)
+   - Estadísticos descriptivos pre/post (media, std, mediana, P05, P95)
+   - Resultado persistido en `resampling_metrics_per_trial_50hz.csv`
+5. **Filtrado de calidad** — descarta trials que no cumplen umbrales:
+   - Pearson `r ≥ 0.85`, desfase `≤ 100 ms`, atenuación `≤ 25 %`
+   - Política **OR ≥ 2**: una métrica falla si falla en AVM _o_ GVM; el trial se descarta si fallan al menos 2 de 3 métricas o si es demasiado corto
+   - Resultado persistido en `trial_quality_config.json`
+6. **Resampleo definitivo** — `resample_poly` con ventana Kaiser (β = 5) a 50 Hz; deriva AVM/GVM y aplica el esquema de 14 columnas.
+7. **Exportación** — genera en `oro`:
+   - `set_a.parquet`: 5 datasets (~528 MB)
+   - `set_b.parquet`: 4 datasets sin UMAFall (~503 MB)
+
+### Esquema de salida (oro)
+
+```
+Dataset, Subject, Activity_Label, Activity_Code, Trial, Sample_Index,
+Ax, Ay, Az, Gx, Gy, Gz, AVM, GVM
+```
+
+### Unidades físicas
+
+- Aceleración (`Ax`, `Ay`, `Az`): en g (1 g ≈ 9.81 m/s²)
+- Giroscopio (`Gx`, `Gy`, `Gz`): en °/s
 
 ---
 
@@ -88,10 +94,10 @@ Los datos normalizados se almacenan en la capa **oro** del Data Lake en formato 
 El proyecto utiliza `pytest`. Para correr la suite de pruebas localmente:
 
 ```bash
-# Tests unitarios e integración (excluye tests lentos que requieren TF fit)
+# Tests unitarios e integración
 uv run pytest -m "not slow" -v
 
-# Todos los tests (incluye entrenamiento real, más lento)
+# Todos los tests
 uv run pytest -v
 ```
 
