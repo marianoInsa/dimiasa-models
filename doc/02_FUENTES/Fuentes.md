@@ -1,8 +1,5 @@
-%% Begin Waypoint %%
-- [[Integrated IoT System for Remote Health Monitoring in Home Hospitalization]]
-- [[KFall - A Large-Scale Open Motion Dataset (KFall) and Benchmark Algorithms for Detecting Pre-impact Fall of the Elderly Using Wearable Inertial Sensors]]
-- [[Multi-Agent Framework for Resilient Medical Triage in the Internet of Medical Things (IoMT)]]
-- [[SisFall - A Fall and Movement Dataset]]
-- [[UP-Fall Detection Dataset A Multimodal Approach]]
-
-%% End Waypoint %%
+- [Integrated IoT System for Remote Health Monitoring in Home Hospitalization](Integrated%20IoT%20System%20for%20Remote%20Health%20Monitoring%20in%20Home%20Hospitalization.md)
+- [KFall - A Large-Scale Open Motion Dataset (KFall) and Benchmark Algorithms for Detecting Pre-impact Fall of the Elderly Using Wearable Inertial Sensors](KFall%20-%20A%20Large-Scale%20Open%20Motion%20Dataset%20%28KFall%29%20and%20Benchmark%20Algorithms%20for%20Detecting%20Pre-impact%20Fall%20of%20the%20Elderly%20Using%20Wearable%20Inertial%20Sensors.md)
+- [Multi-Agent Framework for Resilient Medical Triage in the Internet of Medical Things (IoMT)](Multi-Agent%20Framework%20for%20Resilient%20Medical%20Triage%20in%20the%20Internet%20of%20Medical%20Things%20%28IoMT%29.md)
+- [SisFall - A Fall and Movement Dataset](SisFall%20-%20A%20Fall%20and%20Movement%20Dataset.md)
+- [UP-Fall Detection Dataset A Multimodal Approach](UP-Fall%20Detection%20Dataset%20A%20Multimodal%20Approach.md)

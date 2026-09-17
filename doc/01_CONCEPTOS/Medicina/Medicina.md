@@ -1,15 +1,12 @@
-%% Begin Waypoint %%
-- [[Accidente Cerebrovascular]]
-- [[Arritmia]]
-- [[Ecocardiograma]]
-- [[Electrocardiograma (ECG o EKG)]]
-- [[Falsos positivos]]
-- [[Fotopletismografía (PPG)]]
-- [[Frecuencia cardíaca (Heart rate)]]
-- [[Monitoreo Remoto de Pacientes (RPM)]]
-- [[Oximetría de Pulso (SpO2)]]
-- [[Presión Arterial No Invasiva (NIBP)]]
-- [[Temperatura Cutánea]]
-- [[Triaje médico]]
-
-%% End Waypoint %%
+- [Accidente Cerebrovascular](Accidente%20Cerebrovascular.md)
+- [Arritmia](Arritmia.md)
+- [Ecocardiograma](Ecocardiograma.md)
+- [Electrocardiograma (ECG o EKG)](Electrocardiograma%20%28ECG%20o%20EKG%29.md)
+- [Falsos positivos](Falsos%20positivos.md)
+- [Fotopletismografía (PPG)](Fotopletismografía%20%28PPG%29.md)
+- [Frecuencia cardíaca (Heart rate)](Frecuencia%20cardíaca%20%28Heart%20rate%29.md)
+- [Monitoreo Remoto de Pacientes (RPM)](Monitoreo%20Remoto%20de%20Pacientes%20%28RPM%29.md)
+- [Oximetría de Pulso (SpO2)](Oximetría%20de%20Pulso%20%28SpO2%29.md)
+- [Presión Arterial No Invasiva (NIBP)](Presión%20Arterial%20No%20Invasiva%20%28NIBP%29.md)
+- [Temperatura Cutánea](Temperatura%20Cutánea.md)
+- [Triaje médico](Triaje%20médico.md)

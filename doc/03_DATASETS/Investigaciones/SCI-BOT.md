@@ -86,23 +86,23 @@ El paper de revisión de Casilari et al. (2017) [7] confirma que los datasets 
 
 ## Referencias
 
-[[1]M. Saleh, M. Abbas, and R. Le Bouquin Jeannès, "FallAllD: An Open Dataset of Human Falls and Activities of Daily Living for Classical and Deep Learning Applications," IEEE Sensors Journal, vol. 21, no. 2, pp. 1849–1862, 2021  
-DOI: 10.1109/JSEN.2020.3018335](https://sci-hub.box/10.1109/JSEN.2020.3018335)
+[1]M. Saleh, M. Abbas, and R. Le Bouquin Jeannès, "FallAllD: An Open Dataset of Human Falls and Activities of Daily Living for Classical and Deep Learning Applications," IEEE Sensors Journal, vol. 21, no. 2, pp. 1849–1862, 2021  
+DOI: 10.1109/JSEN.2020.3018335(https://sci-hub.box/10.1109/JSEN.2020.3018335)
 
-[[2]E. Casilari, J. A. Santoyo-Ramón, and J. M. Cano-García, "UMAFall: A Multisensor Dataset for the Research on Automatic Fall Detection," Procedia Computer Science, vol. 110, pp. 32–39, 2017  
-DOI: 10.1016/j.procs.2017.06.110](https://sci-hub.box/10.1016/j.procs.2017.06.110)
+[2]E. Casilari, J. A. Santoyo-Ramón, and J. M. Cano-García, "UMAFall: A Multisensor Dataset for the Research on Automatic Fall Detection," Procedia Computer Science, vol. 110, pp. 32–39, 2017  
+DOI: 10.1016/j.procs.2017.06.110(https://sci-hub.box/10.1016/j.procs.2017.06.110)
 
-[[3]G. Vavoulas, M. Pediaditis, E. G. Spanakis, and M. Tsiknakis, "The MobiFall dataset: An initial evaluation of fall detection algorithms using smartphones," in 13th IEEE International Conference on BioInformatics and BioEngineering (BIBE), 2013, pp. 1–4  
-DOI: 10.1109/BIBE.2013.6701629](https://sci-hub.box/10.1109/BIBE.2013.6701629)
+[3]G. Vavoulas, M. Pediaditis, E. G. Spanakis, and M. Tsiknakis, "The MobiFall dataset: An initial evaluation of fall detection algorithms using smartphones," in 13th IEEE International Conference on BioInformatics and BioEngineering (BIBE), 2013, pp. 1–4  
+DOI: 10.1109/BIBE.2013.6701629(https://sci-hub.box/10.1109/BIBE.2013.6701629)
 
-[[4]D. Mrozek, A. Koczur, and B. Małysiak-Mrozek, "Triaxial Accelerometer-Based Falls and Activities of Daily Life Detection Using Machine Learning," Sensors, vol. 20, no. 13, art. 3777, 2020  
-DOI: 10.3390/s20133777](https://sci-hub.box/10.3390/s20133777)
+[4]D. Mrozek, A. Koczur, and B. Małysiak-Mrozek, "Triaxial Accelerometer-Based Falls and Activities of Daily Life Detection Using Machine Learning," Sensors, vol. 20, no. 13, art. 3777, 2020  
+DOI: 10.3390/s20133777(https://sci-hub.box/10.3390/s20133777)
 
-[[5]J. Klenk et al., "The FARSEEING real-world fall repository: a large-scale collaborative database to collect and share sensor signals from real-world falls," European Review of Aging and Physical Activity, vol. 13, art. 8, 2016  
-DOI: 10.1186/s11556-016-0168-9](https://sci-hub.box/10.1186/s11556-016-0168-9)
+[5]J. Klenk et al., "The FARSEEING real-world fall repository: a large-scale collaborative database to collect and share sensor signals from real-world falls," European Review of Aging and Physical Activity, vol. 13, art. 8, 2016  
+DOI: 10.1186/s11556-016-0168-9(https://sci-hub.box/10.1186/s11556-016-0168-9)
 
-[[6]O. Ojetola, E. Gaura, and J. Brusey, "Data set for fall events and daily activities from inertial sensors," in Proceedings of the 6th ACM Multimedia Systems Conference (MMSys), 2015, pp. 243–248  
-DOI: 10.1145/2713168.2713198](https://sci-hub.box/10.1145/2713168.2713198)
+[6]O. Ojetola, E. Gaura, and J. Brusey, "Data set for fall events and daily activities from inertial sensors," in Proceedings of the 6th ACM Multimedia Systems Conference (MMSys), 2015, pp. 243–248  
+DOI: 10.1145/2713168.2713198(https://sci-hub.box/10.1145/2713168.2713198)
 
-[[7]E. Casilari, J. A. Santoyo-Ramón, and J. M. Cano-García, "Analysis of Public Datasets for Wearable Fall Detection Systems," Sensors, vol. 17, no. 7, art. 1513, 2017  
-DOI: 10.3390/s17071513](https://sci-hub.box/10.3390/s17071513)
+[7]E. Casilari, J. A. Santoyo-Ramón, and J. M. Cano-García, "Analysis of Public Datasets for Wearable Fall Detection Systems," Sensors, vol. 17, no. 7, art. 1513, 2017  
+DOI: 10.3390/s17071513(https://sci-hub.box/10.3390/s17071513)

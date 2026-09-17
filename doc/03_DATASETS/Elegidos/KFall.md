@@ -1,6 +1,6 @@
 
 - Paper online: https://www.frontiersin.org/journals/aging-neuroscience/articles/10.3389/fnagi.2021.692865/full
-- [[KFall - A Large-Scale Open Motion Dataset (KFall) and Benchmark Algorithms for Detecting Pre-impact Fall of the Elderly Using Wearable Inertial Sensors|Paper local]]
+- [Paper local](../../02_FUENTES/KFall%20-%20A%20Large-Scale%20Open%20Motion%20Dataset%20%28KFall%29%20and%20Benchmark%20Algorithms%20for%20Detecting%20Pre-impact%20Fall%20of%20the%20Elderly%20Using%20Wearable%20Inertial%20Sensors.md)
 - Descarga de Dataset: https://sites.google.com/view/kfalldataset (por petición)
 
 ---

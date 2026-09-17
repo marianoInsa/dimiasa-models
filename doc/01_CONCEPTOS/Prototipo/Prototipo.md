@@ -1,24 +1,21 @@
-%% Begin Waypoint %%
-- [[Arquitectura de Tres Capas]]
-- [[Broker MQTT]]
-- [[Capa de Aplicación]]
-- [[Capa de Percepción]]
-- [[Capa de Red]]
-- [[Computación en el Borde (Edge Computing)]]
-- [[Detección de Caídas (MPU6050)]]
-- [[ECG y Arritmias (AD8232)]]
-- [[Fusión Bayesiana]]
-- [[Internet de las Cosas Médicas (IoMT)]]
-- [[LoRaWAN (Long Range Wide Area Network)]]
-- [[Micro Agent Communication Protocol (µACP)]]
-- [[MQTT (Message Queuing Telemetry Transport)]]
-- [[Optimización de Modelos (Cuantización LiteRT)]]
-- [[Protocolo I2C]]
-- [[Protocolos de Baja Carga]]
-- [[Redes 1D-CNN]]
-- [[Redes CNN-LSTM]]
-- [[Sistemas Multiagente (MAS)]]
-- [[SpO2 y Oximetría (MAX30102)]]
-- [[TensorFlow Lite (LiteRT)]]
-
-%% End Waypoint %%
+- [Arquitectura de Tres Capas](Arquitectura%20de%20Tres%20Capas.md)
+- [Broker MQTT](Broker%20MQTT.md)
+- [Capa de Aplicación](Capa%20de%20Aplicación.md)
+- [Capa de Percepción](Capa%20de%20Percepción.md)
+- [Capa de Red](Capa%20de%20Red.md)
+- [Computación en el Borde (Edge Computing)](Computación%20en%20el%20Borde%20%28Edge%20Computing%29.md)
+- [Detección de Caídas (MPU6050)](Detección%20de%20Caídas%20%28MPU6050%29.md)
+- [ECG y Arritmias (AD8232)](ECG%20y%20Arritmias%20%28AD8232%29.md)
+- [Fusión Bayesiana](Fusión%20Bayesiana.md)
+- [Internet de las Cosas Médicas (IoMT)](Internet%20de%20las%20Cosas%20Médicas%20%28IoMT%29.md)
+- [LoRaWAN (Long Range Wide Area Network)](LoRaWAN%20%28Long%20Range%20Wide%20Area%20Network%29.md)
+- [Micro Agent Communication Protocol (µACP)](Micro%20Agent%20Communication%20Protocol%20%28µACP%29.md)
+- [MQTT (Message Queuing Telemetry Transport)](MQTT%20%28Message%20Queuing%20Telemetry%20Transport%29.md)
+- [Optimización de Modelos (Cuantización LiteRT)](Optimización%20de%20Modelos%20%28Cuantización%20LiteRT%29.md)
+- [Protocolo I2C](Protocolo%20I2C.md)
+- [Protocolos de Baja Carga](Protocolos%20de%20Baja%20Carga.md)
+- [Redes 1D-CNN](Redes%201D-CNN.md)
+- [Redes CNN-LSTM](Redes%20CNN-LSTM.md)
+- [Sistemas Multiagente (MAS)](Sistemas%20Multiagente%20%28MAS%29.md)
+- [SpO2 y Oximetría (MAX30102)](SpO2%20y%20Oximetría%20%28MAX30102%29.md)
+- [TensorFlow Lite (LiteRT)](TensorFlow%20Lite%20%28LiteRT%29.md)

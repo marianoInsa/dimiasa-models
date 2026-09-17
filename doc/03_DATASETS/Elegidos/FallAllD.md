@@ -136,7 +136,7 @@ Consta de **26.420 archivos** correspondientes a **35 tipos de caídas** y **44 
 > [!Danger] Si usas Kaggle
 > - La frecuencia de muestreo del acelerómetro y giroscopio fue reducida (downsampling) de 238 Hz a 40 Hz para disminuir el costo computacional.
 
-![[fallalld-ubicacion-dispositivos.jpg]]
+![fallalld-ubicacion-dispositivos](../../img/fallalld-ubicacion-dispositivos.jpg)
 
 
 > [!Warning] A tener en cuenta

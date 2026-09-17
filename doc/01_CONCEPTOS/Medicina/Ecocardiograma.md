@@ -13,7 +13,7 @@ Prueba diagnóstica fundamental porque ofrece una imagen en movimiento del coraz
 
 ## Diferencias con Electrocardiograma
 
-El [[Electrocardiograma (ECG o EKG)]] y el ecocardiograma son pruebas cardíacas no invasivas distintas pero complementarias. El **ECG** mide la actividad eléctrica para detectar arritmias o infartos, mientras que el **ecocardiograma** usa ultrasonido para visualizar la estructura, válvulas y bombeo del corazón. Ambas son esenciales para el diagnóstico cardiovascular.
+El [Electrocardiograma (ECG o EKG)](Electrocardiograma%20%28ECG%20o%20EKG%29.md) y el ecocardiograma son pruebas cardíacas no invasivas distintas pero complementarias. El **ECG** mide la actividad eléctrica para detectar arritmias o infartos, mientras que el **ecocardiograma** usa ultrasonido para visualizar la estructura, válvulas y bombeo del corazón. Ambas son esenciales para el diagnóstico cardiovascular.
 
 ### ¿Cuándo se utiliza cada uno?
 * **ECG:** Suele ser la primera prueba ante síntomas como dolor de pecho, palpitaciones o mareos.

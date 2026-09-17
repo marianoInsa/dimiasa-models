@@ -5,13 +5,13 @@ tags:
 ## **SpO2 y Oximetría (MAX30102)**
 
 >[!info] Fase del Plan de Trabajo
->[[FASE 1 - MODELOS EN PC]], [[FASE 3 - SENSORES FÍSICOS]] y [[FASE 4 - SISTEMA MULTIAGENTE]]
+>[FASE 1 - MODELOS EN PC](../../00_PLAN/FASE%201%20-%20MODELOS%20EN%20PC.md), [FASE 3 - SENSORES FÍSICOS](../../00_PLAN/FASE%203%20-%20SENSORES%20FÍSICOS.md) y [FASE 4 - SISTEMA MULTIAGENTE](../../00_PLAN/FASE%204%20-%20SISTEMA%20MULTIAGENTE.md)
 
-El MAX30102 es un módulo de oximetría de pulso que emplea tecnología de [[Fotopletismografía (PPG)]] para medir la [[Oximetría de Pulso (SpO2)]] y la perfusión tisular del paciente. Al igual que el acelerómetro, este componente se comunica con la unidad de procesamiento central a través del [[Protocolo I2C]], y sus lecturas en bruto son procesadas y validadas mediante bibliotecas especializadas de Python como pyPPG y NeuroKit2.
+El MAX30102 es un módulo de oximetría de pulso que emplea tecnología de [Fotopletismografía (PPG)](../Medicina/Fotopletismografía%20%28PPG%29.md) para medir la [Oximetría de Pulso (SpO2)](../Medicina/Oximetría%20de%20Pulso%20%28SpO2%29.md) y la perfusión tisular del paciente. Al igual que el acelerómetro, este componente se comunica con la unidad de procesamiento central a través del [Protocolo I2C](Protocolo%20I2C.md), y sus lecturas en bruto son procesadas y validadas mediante bibliotecas especializadas de Python como pyPPG y NeuroKit2.
 
-![[sensor-oximetria.png]]
+![sensor-oximetria](../../img/sensor-oximetria.png)
 
-Este flujo de trabajo constituye el "Módulo C", el cual se valida inicialmemente empleando el dataset de pacientes "BIDMC". Durante el monitoreo distribuido en tiempo real, el Agente de SpO2 es responsable de vigilar los niveles de oxigenación frente a umbrales clínicos de riesgo (como desaturaciones por debajo del 94% o del 85%). Su integración en el razonamiento del sistema es vital: si el agente reporta una desaturación crítica pero el paciente registra movimientos bruscos simultáneos según el MPU6050, el sistema deduce de manera autónoma que podría tratarse de un fallo o desprendimiento del sensor, catalogando el evento con precaución y mitigando el riesgo de la [[Falsos positivos|"fatiga de alarmas"]].
+Este flujo de trabajo constituye el "Módulo C", el cual se valida inicialmemente empleando el dataset de pacientes "BIDMC". Durante el monitoreo distribuido en tiempo real, el Agente de SpO2 es responsable de vigilar los niveles de oxigenación frente a umbrales clínicos de riesgo (como desaturaciones por debajo del 94% o del 85%). Su integración en el razonamiento del sistema es vital: si el agente reporta una desaturación crítica pero el paciente registra movimientos bruscos simultáneos según el MPU6050, el sistema deduce de manera autónoma que podría tratarse de un fallo o desprendimiento del sensor, catalogando el evento con precaución y mitigando el riesgo de la ["fatiga de alarmas"](../Medicina/Falsos%20positivos.md).
 
 #### Links
 * **BIDMC PPG and Respiration Dataset (PhysioNet):** Contiene registros continuos de pacientes en cuidados intensivos, incluyendo fotopletismografía (PPG), frecuencia respiratoria y niveles de SpO2. Es vital para entender la forma de onda original que luego replicará tu hardware en código real.

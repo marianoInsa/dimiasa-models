@@ -13,7 +13,7 @@ Existe una **desconexión fisiológica crítica** entre ambas temperaturas debid
 - En resumen, las respuestas involuntarias del cuerpo (como tiritar o sudar) están dictaminadas casi en exclusiva por la temperatura central, no por la cutánea.
 
 ## Cómo se mide
-La medición primaria se realiza con sensores flexibles pegados a la piel o termómetros de contacto (como el modelo LM35). Sin embargo, como tomar esta lectura de forma aislada puede llevar a diagnósticos erróneos, los ecosistemas de monitoreo avanzado (IoMT) gestionan la medición mediante algoritmos de [[Computación en el Borde (Edge Computing)]] de la siguiente manera:
+La medición primaria se realiza con sensores flexibles pegados a la piel o termómetros de contacto (como el modelo LM35). Sin embargo, como tomar esta lectura de forma aislada puede llevar a diagnósticos erróneos, los ecosistemas de monitoreo avanzado (IoMT) gestionan la medición mediante algoritmos de [Computación en el Borde (Edge Computing)](../Prototipo/Computación%20en%20el%20Borde%20%28Edge%20Computing%29.md) de la siguiente manera:
 
 - **Modelos de Regresión Múltiple:** Se integra la medición de la temperatura de la piel con datos de **sensores ambientales**, cruzando variables como la temperatura del cuarto, la humedad relativa, el flujo de calor local y la tasa metabólica del paciente (estimada por acelerómetros).
 - **Análisis de Componentes Principales (PCA):** Debido a que muchas variables ambientales y dérmicas se influyen entre sí, se aplica PCA para extraer componentes matemáticos limpios y evitar que el modelo se distorsione por datos solapados (multicolinealidad).

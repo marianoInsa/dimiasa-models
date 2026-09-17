@@ -9,7 +9,7 @@ tags:
 La **presión sistólica** y la **presión diastólica** son las dos lecturas específicas que componen la medición de la presión arterial, la cual es uno de los signos vitales fundamentales del cuerpo humano. Ambas presiones se miden en milímetros de mercurio (mmHg) y sus lecturas pueden verse afectadas por diversos factores fisiológicos, como la edad, el nivel de actividad, la medicación y el estado del sistema nervioso autónomo.
 
 ## Cómo se mide
-Tradicionalmente, la NIBP se medía mediante el *método auscultatorio*, el cual depende de un profesional que escucha los sonidos arteriales (sonidos de Korotkoff) utilizando un estetoscopio y un manguito manual. Sin embargo, en la telemedicina moderna y los ecosistemas de [[Internet de las Cosas Médicas (IoMT)]], el estándar es el **método oscilométrico**. La oscilometría es preferida porque puede ser totalmente automatizada por microcontroladores y sigue siendo precisa en estados críticos donde los sonidos arteriales son inaudibles, como en vasoconstricciones severas.
+Tradicionalmente, la NIBP se medía mediante el *método auscultatorio*, el cual depende de un profesional que escucha los sonidos arteriales (sonidos de Korotkoff) utilizando un estetoscopio y un manguito manual. Sin embargo, en la telemedicina moderna y los ecosistemas de [Internet de las Cosas Médicas (IoMT)](../Prototipo/Internet%20de%20las%20Cosas%20Médicas%20%28IoMT%29.md), el estándar es el **método oscilométrico**. La oscilometría es preferida porque puede ser totalmente automatizada por microcontroladores y sigue siendo precisa en estados críticos donde los sonidos arteriales son inaudibles, como en vasoconstricciones severas.
 
 El método oscilométrico automatizado funciona de la siguiente manera:
 
@@ -26,10 +26,10 @@ De manera alternativa, algunos relojes inteligentes comerciales (smartwatches) e
 ---
 
 #### Antes
-![[presion arterial no invasiva (antes).png]]
+![presion arterial no invasiva (antes)](../../img/presion%20arterial%20no%20invasiva%20%28antes%29.png)
 
 #### Ahora (IoMT)
-![[presion arterial no invasiva (despues).png]]
+![presion arterial no invasiva (despues)](../../img/presion%20arterial%20no%20invasiva%20%28despues%29.png)
 
 ---
 ### Enlaces de Interés

@@ -1,6 +1,7 @@
 ---
 tags: plan
 ---
+> **Avance:** el estado actualizado vive en el [tablero del README](../README.md#tablero-de-avance).
 
 ---
 
@@ -90,11 +91,11 @@ tags: plan
 
 | **Fase**                                                                  | **Duración** | **Hardware**     | **Resultado**            |
 | ------------------------------------------------------------------------- | ------------ | ---------------- | ------------------------ |
-| **[[FASE 1 - MODELOS EN PC\|FASE 1: MODELOS EN PC]]**                     | 2-3 semanas  | Solo laptop      | 3 modelos entrenados     |
-| **[[FASE 2 - CONVERSIÓN LiteRT\|FASE 2: CONVERSIÓN LiteRT]]**             | 1-2 semanas  | Solo laptop      | 3 modelos <1 MB          |
-| **[[FASE 3 - SENSORES FÍSICOS\|FASE 3: SENSORES FÍSICOS]]**               | 2-3 semanas  | ESP32 + sensores | Datos reales funcionando |
-| **[[FASE 4 - SISTEMA MULTIAGENTE\|FASE 4: SISTEMA MULTIAGENTE]]**         | 2-3 semanas  | ESP32            | Prototipo integrado      |
-| **[[FASE 5 - VALIDACIÓN EXPERIMENTAL\|FASE 5: VALIDACIÓN EXPERIMENTAL]]** | 2-3 semanas  | Todo lo anterior | Métricas del paper       |
+| **[FASE 1: MODELOS EN PC](FASE%201%20-%20MODELOS%20EN%20PC.md)**                     | 2-3 semanas  | Solo laptop      | 3 modelos entrenados     |
+| **[FASE 2: CONVERSIÓN LiteRT](FASE%202%20-%20CONVERSIÓN%20LiteRT.md)**             | 1-2 semanas  | Solo laptop      | 3 modelos <1 MB          |
+| **[FASE 3: SENSORES FÍSICOS](FASE%203%20-%20SENSORES%20FÍSICOS.md)**               | 2-3 semanas  | ESP32 + sensores | Datos reales funcionando |
+| **[FASE 4: SISTEMA MULTIAGENTE](FASE%204%20-%20SISTEMA%20MULTIAGENTE.md)**         | 2-3 semanas  | ESP32            | Prototipo integrado      |
+| **[FASE 5: VALIDACIÓN EXPERIMENTAL](FASE%205%20-%20VALIDACIÓN%20EXPERIMENTAL.md)** | 2-3 semanas  | Todo lo anterior | Métricas del paper       |
 
 ---
 

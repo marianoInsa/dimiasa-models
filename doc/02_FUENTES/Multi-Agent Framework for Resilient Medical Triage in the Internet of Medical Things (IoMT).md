@@ -38,7 +38,7 @@ Propone un modelo distribuido con un enfoque de conectividad híbrida:
 - **MPX5050:** Transductor de presión para vigilar de forma no invasiva la presión arterial del paciente.
 - **MG-811:** Sensor ambiental responsable de medir la calidad del aire.
 
-![[modelo anterior de la arqui centralizada en la nube.png]]
+![modelo anterior de la arqui centralizada en la nube](../img/modelo%20anterior%20de%20la%20arqui%20centralizada%20en%20la%20nube.png)
 
 ### **Agentes**
 
@@ -52,7 +52,7 @@ La "sociedad" está orquestada por distintos especialistas lógicos que se comun
 	- _Agente de Caídas_
 	- _Agente Ambiental_
 
-![[diagrama multi agent framework.png]]
+![diagrama multi agent framework](../img/diagrama%20multi%20agent%20framework.png)
 
 ### **Fusión Bayesiana**
 

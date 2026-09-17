@@ -3,7 +3,7 @@ tags:
   - IoMT
 ---
 # Monitoreo Remoto de Pacientes (RPM)
-> Es un modelo de atención que traslada la vigilancia médica desde el hospital al hogar del paciente. Utiliza dispositivos de **[[Internet de las Cosas Médicas (IoMT)]]** y algoritmos de **Inteligencia Artificial** para recopilar, transmitir y analizar datos de salud en tiempo real o de forma diferida, sin que el paciente necesite desplazarse.
+> Es un modelo de atención que traslada la vigilancia médica desde el hospital al hogar del paciente. Utiliza dispositivos de **[Internet de las Cosas Médicas (IoMT)](../Prototipo/Internet%20de%20las%20Cosas%20Médicas%20%28IoMT%29.md)** y algoritmos de **Inteligencia Artificial** para recopilar, transmitir y analizar datos de salud en tiempo real o de forma diferida, sin que el paciente necesite desplazarse.
 
 ## Objetivo
 El objetivo central es **mejorar los resultados clínicos** y la calidad de vida del paciente mediante:

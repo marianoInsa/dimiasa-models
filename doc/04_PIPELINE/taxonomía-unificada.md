@@ -8,7 +8,7 @@ Con el objetivo de facilitar la comparación entre datasets y permitir una evalu
 
 La **dirección** de cada caída se registra como dato informativo por dataset (ADEL/ATR/LAT/VERT/ND), no como eje de agrupación: subdividir los grupos por dirección deja celdas con muy pocas muestras para comparar métricas de forma significativa.
 
-Esta revisión incorpora los hallazgos de la investigación documentada en `taxonomia_unificada_adl_caidas_v2.md`.
+Esta revisión incorpora los hallazgos de la investigación documentada en [taxonomia_unificada_adl_caidas_v2.md](../03_DATASETS/Investigaciones/taxonomia_unificada_adl_caidas_v2.md).
 
 ## Descripciones Oficiales por Dataset
 

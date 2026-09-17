@@ -1,7 +1,7 @@
 Fecha: 28 April 2019
 
 - Paper online: https://www.mdpi.com/1424-8220/19/9/1988
-- [[UP-Fall Detection Dataset A Multimodal Approach|Paper local]]
+- [Paper local](../../02_FUENTES/UP-Fall%20Detection%20Dataset%20A%20Multimodal%20Approach.md)
 - Dataset: https://sites.google.com/up.edu.mx/har-up/
 - Repo: https://github.com/jpnm561/HAR-UP
 

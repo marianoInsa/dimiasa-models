@@ -5,13 +5,13 @@ tags:
 ## **ECG y Arritmias (AD8232)**
 
 >[!info] Fase del Plan de Trabajo
->[[FASE 1 - MODELOS EN PC]], [[FASE 3 - SENSORES FÍSICOS]] y [[FASE 4 - SISTEMA MULTIAGENTE]]
+>[FASE 1 - MODELOS EN PC](../../00_PLAN/FASE%201%20-%20MODELOS%20EN%20PC.md), [FASE 3 - SENSORES FÍSICOS](../../00_PLAN/FASE%203%20-%20SENSORES%20FÍSICOS.md) y [FASE 4 - SISTEMA MULTIAGENTE](../../00_PLAN/FASE%204%20-%20SISTEMA%20MULTIAGENTE.md)
 
-El módulo AD8232 es un sensor analógico diseñado para medir la actividad eléctrica del corazón y capturar biopotenciales cardíacos, centrándose en este prototipo en la derivación II (Lead II) del [[Electrocardiograma (ECG o EKG)|electrocardiograma (ECG]]). Al generar señales analógicas muy delicadas y sensibles al ruido eléctrico del entorno, requiere el uso de un conversor analógico a digital (ADC), como el integrado en el microcontrolador ESP32 o un conversor externo (MCP3008), para poder procesar la información correctamente.
+El módulo AD8232 es un sensor analógico diseñado para medir la actividad eléctrica del corazón y capturar biopotenciales cardíacos, centrándose en este prototipo en la derivación II (Lead II) del [electrocardiograma (ECG](../Medicina/Electrocardiograma%20%28ECG%20o%20EKG%29.md)). Al generar señales analógicas muy delicadas y sensibles al ruido eléctrico del entorno, requiere el uso de un conversor analógico a digital (ADC), como el integrado en el microcontrolador ESP32 o un conversor externo (MCP3008), para poder procesar la información correctamente.
 
-![[sensor-ecg.png]]
+![sensor-ecg](../../img/sensor-ecg.png)
 
-Los datos obtenidos por este sensor son analizados por el "Módulo B", el cual emplea una red neuronal unidimensional ([[Redes 1D-CNN|1D-CNN]]) ultraligera entrenada con la base de datos "MIT-BIH" para clasificar la estabilidad cardíaca y detectar arritmias. En la lógica de triaje cooperativo, el Agente de ECG provee un contexto hemodinámico crucial; su información permite validar emergencias graves al combinarse con otros agentes (como confirmar un síncope si hay hipotensión asociada), o descartar anomalías si un pulso elevado corresponde simplemente a un estado de actividad física normal verificado por el acelerómetro.
+Los datos obtenidos por este sensor son analizados por el "Módulo B", el cual emplea una red neuronal unidimensional ([1D-CNN](Redes%201D-CNN.md)) ultraligera entrenada con la base de datos "MIT-BIH" para clasificar la estabilidad cardíaca y detectar arritmias. En la lógica de triaje cooperativo, el Agente de ECG provee un contexto hemodinámico crucial; su información permite validar emergencias graves al combinarse con otros agentes (como confirmar un síncope si hay hipotensión asociada), o descartar anomalías si un pulso elevado corresponde simplemente a un estado de actividad física normal verificado por el acelerómetro.
 
 #### Links
 * **MIT-BIH Arrhythmia Database (PhysioNet):** El patrón oro indiscutido. Contiene registros de ECG ambulatorios. Es ideal para aplicar segmentación en ventanas, programar los filtros pasa-banda y alimentar arquitecturas convolucionales 1D.

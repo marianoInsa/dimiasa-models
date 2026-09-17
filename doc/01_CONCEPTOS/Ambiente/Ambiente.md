@@ -1,7 +1,4 @@
-%% Begin Waypoint %%
-- [[Humedad relativa]]
-- [[Intensidad lumínica]]
-- [[Niveles de dióxido de carbono (CO2)]]
-- [[Presión Atmosférica]]
-
-%% End Waypoint %%
+- [Humedad relativa](Humedad%20relativa.md)
+- [Intensidad lumínica](Intensidad%20lumínica.md)
+- [Niveles de dióxido de carbono (CO2)](Niveles%20de%20dióxido%20de%20carbono%20%28CO2%29.md)
+- [Presión Atmosférica](Presión%20Atmosférica.md)

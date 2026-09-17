@@ -29,7 +29,7 @@ El sistema emplea un **modelo IoT de tres capas**:
 2. **Capa de Red:** Es la columna vertebral de comunicaciones. Utiliza un enfoque híbrido de conectividad con **Wi-Fi** (para alta velocidad y monitoreo en tiempo real) y **LoRaWAN / redes celulares 4G** (como respaldo de largo alcance y bajo consumo ante caídas de internet), intercambiando los datos mediante el protocolo MQTT.
 3. **Capa de Aplicación:** Aloja el núcleo inteligente en la nube, encargándose del almacenamiento seguro en bases de datos (PostgreSQL, InfluxDB), el análisis de datos mediante algoritmos y la interfaz de usuario (_dashboards_ como Grafana y aplicaciones móviles) para el personal de salud.
 
-![[diagrama de arquitectura iomt.png]]
+![diagrama de arquitectura iomt](../img/diagrama%20de%20arquitectura%20iomt.png)
 
 ### **Sensores utilizados**
 

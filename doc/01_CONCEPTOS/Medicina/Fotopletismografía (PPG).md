@@ -14,7 +14,7 @@ La señal PPG capturada es una onda compleja superpuesta que se divide en dos co
 - **Componente fluctuante (AC):** Es la variación dinámica que es directamente proporcional a la onda del pulso arterial generada por cada latido o gasto cardíaco sistólico.
 
 ## Cómo se mide
-La medición se realiza de forma no invasiva mediante biosensores ópticos que constan de fuentes emisoras de luz y receptores ([[SpO2 y Oximetría (MAX30102)]]), usualmente colocados en áreas con buena irrigación superficial como la yema del dedo, la frente o el lóbulo de la oreja. El proceso es el siguiente:
+La medición se realiza de forma no invasiva mediante biosensores ópticos que constan de fuentes emisoras de luz y receptores ([SpO2 y Oximetría (MAX30102)](../Prototipo/SpO2%20y%20Oximetría%20%28MAX30102%29.md)), usualmente colocados en áreas con buena irrigación superficial como la yema del dedo, la frente o el lóbulo de la oreja. El proceso es el siguiente:
 
 - **Emisión de luz específica:** El dispositivo utiliza Diodos Emisores de Luz (LED) para inyectar fotones en la piel. La longitud de onda depende del objetivo clínico:
     - Para medir el ritmo cardíaco (muy común en _wearables_ o relojes inteligentes), se suele utilizar un **LED de luz verde**, ya que esta longitud de onda es **menos susceptible a sufrir distorsiones (artefactos) por los movimientos** del usuario.

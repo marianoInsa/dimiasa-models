@@ -493,5 +493,3 @@ This is an open-access article distributed under the terms of the [Creative Com
 Disclaimer
 
 All claims expressed in this article are solely those of the authors and do not necessarily represent those of their affiliated organizations, or those of the publisher, the editors and the reviewers. Any product that may be evaluated in this article or claim that may be made by its manufacturer is not guaranteed or endorsed by the publisher.
-
-![](chrome-extension://kobncfkmjelbefaoohoblamnbackjggk/icon/icon_32.png)

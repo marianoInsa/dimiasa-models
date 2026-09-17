@@ -9,9 +9,9 @@ El electrocardiograma (EKG, del alemán Elektrokardiogramm) es la representació
 
 ---
 
-![[electrocardiograma-ejecucion.png]]
+![electrocardiograma-ejecucion](../../img/electrocardiograma-ejecucion.png)
 
-![[electrocardiograma-elementos-grafico.png]]
+![electrocardiograma-elementos-grafico](../../img/electrocardiograma-elementos-grafico.png)
 
 ---
 
@@ -27,13 +27,13 @@ El electrocardiograma (EKG, del alemán Elektrokardiogramm) es la representació
 ## Concepto
 >El Electrocardiograma (ECG) es una prueba médica que registra la actividad eléctrica del corazón a lo largo del tiempo. Un ECG de **derivación única** (single-lead) es una versión simplificada de esta prueba, diseñada especialmente para dispositivos portátiles (wearables) e IoMT, en la cual la adquisición de la señal se limita a un solo canal o vector periférico analógico.
 
-A pesar de esta restricción (frente a los ECG clínicos tradicionales de 12 derivaciones), esta configuración suele utilizar el equivalente a la **Derivación II** o MLII (Modified Limb Lead II), la cual proporciona una visibilidad excepcional de los vectores de despolarización ventricular. Esto permite identificar de forma clara los **complejos QRS y las ondas T**, siendo fundamental para detectar morfológicamente **[[Arritmia]]** y alteraciones cardíacas.
+A pesar de esta restricción (frente a los ECG clínicos tradicionales de 12 derivaciones), esta configuración suele utilizar el equivalente a la **Derivación II** o MLII (Modified Limb Lead II), la cual proporciona una visibilidad excepcional de los vectores de despolarización ventricular. Esto permite identificar de forma clara los **complejos QRS y las ondas T**, siendo fundamental para detectar morfológicamente **[Arritmia](Arritmia.md)** y alteraciones cardíacas.
 
 ## Cómo se mide
 La medición se realiza a través de una cadena de hardware y procesamiento inteligente de la siguiente manera:
 
 - **Electrodos de contacto:** Se utilizan parches colocados en el pecho, brazos o piernas que captan los minúsculos cambios eléctricos cardíacos. Se pueden emplear tanto electrodos "húmedos" convencionales (de Ag/AgCl que usan un gel electrolítico como conductor) como electrodos "secos" (placas recubiertas de plata que no requieren gel).
-- **Amplificación del biopotencial:** En los prototipos IoMT modernos, la señal captada por los electrodos pasa por un **amplificador de biopotencial analógico (típicamente el [[ECG y Arritmias (AD8232)|AD8232]])**, que limpia y amplifica la señal del corazón.
+- **Amplificación del biopotencial:** En los prototipos IoMT modernos, la señal captada por los electrodos pasa por un **amplificador de biopotencial analógico (típicamente el [AD8232](../Prototipo/ECG%20y%20Arritmias%20%28AD8232%29.md))**, que limpia y amplifica la señal del corazón.
 - **Conversión Digital:** Esta señal se envía a un **Convertidor Analógico-Digital (ADC)** integrado en un microcontrolador central (como el ESP32) para digitalizar la información.
 - **Procesamiento Inteligente (Edge AI):** Para analizar el electrocardiograma en tiempo real directamente en el dispositivo, el estándar actual utiliza **Redes Neuronales Convolucionales Unidimensionales (1D-CNN)**. Estas redes procesan la morfología de la señal latido a latido desplazándose en el dominio temporal continuo, logrando clasificar arritmias con una precisión superior al 97% en fracciones de segundo y con muy bajo consumo de memoria.
 

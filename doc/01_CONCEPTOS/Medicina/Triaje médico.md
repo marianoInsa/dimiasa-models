@@ -13,7 +13,7 @@ Se lleva a cabo mediante **sistemas estructurados de cinco niveles de prioridad
 
 ---
 
-![[triage.png]]
+![triage](../../img/triage.png)
 
 ---
 

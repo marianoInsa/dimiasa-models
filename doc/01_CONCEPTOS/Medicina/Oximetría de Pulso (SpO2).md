@@ -8,7 +8,7 @@ tags:
 
 ---
 
-![[sp02-oximetro.png]]
+![sp02-oximetro](../../img/sp02-oximetro.png)
 
 ---
 
@@ -17,7 +17,7 @@ Se realiza de forma no invasiva utilizando un dispositivo llamado **oxímetro de
 
 - **Emisión de luz:** El sensor emite fotones alternando entre un **diodo de luz roja** (la cual es fuertemente absorbida por la sangre sin oxígeno) y un **diodo de luz infrarroja** (absorbida por la sangre rica en oxígeno).
 - **Detección:** Un fotodetector mide la cantidad e intensidad de luz que logra atravesar o rebotar en los tejidos de la piel.
-- **Procesamiento de la señal:** Esta medición genera una onda óptica (señal fotopletismográfica o PPG) que es procesada por un microcontrolador (como el Módulo MAX30100 o el [[SpO2 y Oximetría (MAX30102)]] utilizados frecuentemente en dispositivos [[Internet de las Cosas Médicas (IoMT)|IoMT]]).
+- **Procesamiento de la señal:** Esta medición genera una onda óptica (señal fotopletismográfica o PPG) que es procesada por un microcontrolador (como el Módulo MAX30100 o el [SpO2 y Oximetría (MAX30102)](../Prototipo/SpO2%20y%20Oximetría%20%28MAX30102%29.md) utilizados frecuentemente en dispositivos [IoMT](../Prototipo/Internet%20de%20las%20Cosas%20Médicas%20%28IoMT%29.md)).
 - **Cálculo final:** El algoritmo aísla las pulsaciones de la sangre arterial del ruido generado por huesos y músculos, y calcula un índice matemático ("Ratio of Ratios") para proyectar el **porcentaje exacto de oxígeno en tiempo real**.
 
 ---

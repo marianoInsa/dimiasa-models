@@ -65,55 +65,55 @@ Si lo deseas, te puedo redactar una plantilla de correo formal en inglés dirigi
 
 ## ¿Qué es el dataset FARSEEING?
 
-Es el **mayor repositorio de datos de caídas reales en el mundo** registrado con sensores portátiles (wearable sensors) en personas mayores. Contiene más de **200 caídas reales verificadas** registradas entre 2012-2015, con datos de acelerómetro, giroómetro y magnetómetro.[[ispgr](https://ispgr.org/the-farseeing-real-world-fall-repository/)]
+Es el **mayor repositorio de datos de caídas reales en el mundo** registrado con sensores portátiles (wearable sensors) en personas mayores. Contiene más de **200 caídas reales verificadas** registradas entre 2012-2015, con datos de acelerómetro, giroómetro y magnetómetro.[ispgr](https://ispgr.org/the-farseeing-real-world-fall-repository/)
 
 ## Contacto oficial principal (gestor del dataset)
 
 |Campo|Información|
 |---|---|
-|**Nombre**|**Jochen Klenk** (Senior Research Scientist) [[ispgr](https://ispgr.org/the-farseeing-real-world-fall-repository/)]|
-|**Rol**|**FARSEEING database manager** - líder del grupo de análisis de señales de caídas [[ispgr](https://ispgr.org/the-farseeing-real-world-fall-repository/)]|
-|**Institución principal**|**Department of Clinical Gerontology, Robert Bosch Hospital (RBK)**, Stuttgart, Alemania [[ispgr](https://ispgr.org/the-farseeing-real-world-fall-repository/)]|
-|**Institución secundaria**|**Institute of Epidemiology and Medical Biometry, Ulm University**, Alemania [[ispgr](https://ispgr.org/the-farseeing-real-world-fall-repository/)]|
-|**Teléfono RBK**|**+49 711 8101-0** [[bioregio-stern](https://www.bioregio-stern.de/en/database/company/robert-bosch-hospital)]|
-|**Correo general RBK**|**info@rbk.de** [[bioregio-stern](https://www.bioregio-stern.de/en/database/company/robert-bosch-hospital)]|
-|**Contacto comunicaciones**|**Britta Käppeler**, Head of Corporate Communications [[bioregio-stern](https://www.bioregio-stern.de/en/database/company/robert-bosch-hospital)]|
+|**Nombre**|**Jochen Klenk** (Senior Research Scientist) [ispgr](https://ispgr.org/the-farseeing-real-world-fall-repository/)|
+|**Rol**|**FARSEEING database manager** - líder del grupo de análisis de señales de caídas [ispgr](https://ispgr.org/the-farseeing-real-world-fall-repository/)|
+|**Institución principal**|**Department of Clinical Gerontology, Robert Bosch Hospital (RBK)**, Stuttgart, Alemania [ispgr](https://ispgr.org/the-farseeing-real-world-fall-repository/)|
+|**Institución secundaria**|**Institute of Epidemiology and Medical Biometry, Ulm University**, Alemania [ispgr](https://ispgr.org/the-farseeing-real-world-fall-repository/)|
+|**Teléfono RBK**|**+49 711 8101-0** [bioregio-stern](https://www.bioregio-stern.de/en/database/company/robert-bosch-hospital)|
+|**Correo general RBK**|**info@rbk.de** [bioregio-stern](https://www.bioregio-stern.de/en/database/company/robert-bosch-hospital)|
+|**Contacto comunicaciones**|**Britta Käppeler**, Head of Corporate Communications [bioregio-stern](https://www.bioregio-stern.de/en/database/company/robert-bosch-hospital)|
 
 ## Otros contactos del consorcio FARSEEING
 
 |Nombre|Rol|Institución|Correo|
 |---|---|---|---|
-|**Anisoara Ionescu**|Persona de contacto del proyecto|**EPFL**, Lausanne, Suiza|**anisoara.ionescu@epfl.ch** [[epfl](https://www.epfl.ch/labs/lmam/page-125471-en-html/page-125543-en-html/page-125553-en-html/page-73892-en-html/)]|
-|**Teléfono EPFL**|||**+41 21 693 56 26** [[people.epfl](https://people.epfl.ch/anisoara.ionescu?lang=en)]|
-|**Kamiar Aminian**|Profesor Emeritus (LMAM Laboratory)|**EPFL**, Suiza|**kamiar.aminian@epfl.ch** [[epfl](https://www.epfl.ch/labs/lmam/)]|
-|**Christopher Moufawad El Achkar**|Investigador involucrado|**EPFL**, Suiza|(email verificado en epfl.ch) [[scholar.google](https://scholar.google.ch/citations?user=JweGI18AAAAJ&hl=en)]|
-|**Alan Kevin Bourke**|Investigador involucrado|-|- [[epfl](https://www.epfl.ch/labs/lmam/page-125471-en-html/page-125543-en-html/page-125553-en-html/page-73892-en-html/)]|
+|**Anisoara Ionescu**|Persona de contacto del proyecto|**EPFL**, Lausanne, Suiza|**anisoara.ionescu@epfl.ch** [epfl](https://www.epfl.ch/labs/lmam/page-125471-en-html/page-125543-en-html/page-125553-en-html/page-73892-en-html/)|
+|**Teléfono EPFL**|||**+41 21 693 56 26** [people.epfl](https://people.epfl.ch/anisoara.ionescu?lang=en)|
+|**Kamiar Aminian**|Profesor Emeritus (LMAM Laboratory)|**EPFL**, Suiza|**kamiar.aminian@epfl.ch** [epfl](https://www.epfl.ch/labs/lmam/)|
+|**Christopher Moufawad El Achkar**|Investigador involucrado|**EPFL**, Suiza|(email verificado en epfl.ch) [scholar.google](https://scholar.google.ch/citations?user=JweGI18AAAAJ&hl=en)|
+|**Alan Kevin Bourke**|Investigador involucrado|-|- [epfl](https://www.epfl.ch/labs/lmam/page-125471-en-html/page-125543-en-html/page-125553-en-html/page-73892-en-html/)|
 
 ## ¿Cómo obtener el dataset?
 
-1. **Datos disponibles**: Un dataset de **20 caídas seleccionadas** está disponible **bajo solicitud**[[ispgr](https://ispgr.org/the-farseeing-real-world-fall-repository/)]
+1. **Datos disponibles**: Un dataset de **20 caídas seleccionadas** está disponible **bajo solicitud**[ispgr](https://ispgr.org/the-farseeing-real-world-fall-repository/)
     
 2. **Proceso**:
     
-    - Descargar el **formulario de solicitud** (application form) desde el sitio web del proyecto[[ehtel](https://www.ehtel.eu/activities/eu-funded-projects/farseeing.html)]
+    - Descargar el **formulario de solicitud** (application form) desde el sitio web del proyecto[ehtel](https://www.ehtel.eu/activities/eu-funded-projects/farseeing.html)
         
-    - Solicitar colaboración con el consorcio FARSEEING para preguntas de investigación específicas[[ispgr](https://ispgr.org/the-farseeing-real-world-fall-repository/)]
+    - Solicitar colaboración con el consorcio FARSEEING para preguntas de investigación específicas[ispgr](https://ispgr.org/the-farseeing-real-world-fall-repository/)
         
-3. **Política de acceso**: El consorcio busca compartir los datos con otros investigadores[[pubmed.ncbi.nlm.nih](https://pubmed.ncbi.nlm.nih.gov/27807468/)]
+3. **Política de acceso**: El consorcio busca compartir los datos con otros investigadores[pubmed.ncbi.nlm.nih](https://pubmed.ncbi.nlm.nih.gov/27807468/)
     
 
 ## Páginas oficiales
 
 |Sitio|URL|Estado|
 |---|---|---|
-|**Sitio web del proyecto**|**http://farseeingresearch.eu/**|Oficial (referenciado 2018) [[ispgr](https://ispgr.org/the-farseeing-real-world-fall-repository/)]|
-|**Página ISPGR**|**https://ispgr.org/the-farseeing-real-world-fall-repository/**|Activa (2018) [[ispgr](https://ispgr.org/the-farseeing-real-world-fall-repository/)]|
-|**Página EHTEL**|**https://www.ehtel.eu/activities/eu-funded-projects/farseeing.html**|Activa [[ehtel](https://www.ehtel.eu/activities/eu-funded-projects/farseeing.html)]|
-|**Publicación oficial**|DOI: 10.1186/s11556-016-0168-9|Publicada 2016 [[ispgr](https://ispgr.org/the-farseeing-real-world-fall-repository/)]|
+|**Sitio web del proyecto**|**http://farseeingresearch.eu/**|Oficial (referenciado 2018) [ispgr](https://ispgr.org/the-farseeing-real-world-fall-repository/)|
+|**Página ISPGR**|**https://ispgr.org/the-farseeing-real-world-fall-repository/**|Activa (2018) [ispgr](https://ispgr.org/the-farseeing-real-world-fall-repository/)|
+|**Página EHTEL**|**https://www.ehtel.eu/activities/eu-funded-projects/farseeing.html**|Activa [ehtel](https://www.ehtel.eu/activities/eu-funded-projects/farseeing.html)|
+|**Publicación oficial**|DOI: 10.1186/s11556-016-0168-9|Publicada 2016 [ispgr](https://ispgr.org/the-farseeing-real-world-fall-repository/)|
 
 ## Publicación científica de referencia
 
-**Klenk J, Schwickert L, Palmerini L, et al.** "The FARSEEING real-world fall repository: a large-scale collaborative database to collect and share sensor signals from real-world falls." _European Review of Aging and Physical Activity_. 2016;13:8[[ispgr](https://ispgr.org/the-farseeing-real-world-fall-repository/)]
+**Klenk J, Schwickert L, Palmerini L, et al.** "The FARSEEING real-world fall repository: a large-scale collaborative database to collect and share sensor signals from real-world falls." _European Review of Aging and Physical Activity_. 2016;13:8[ispgr](https://ispgr.org/the-farseeing-real-world-fall-repository/)
 
 ---
 
@@ -128,7 +128,7 @@ Es el **mayor repositorio de datos de caídas reales en el mundo** registrado co
 3. Descargar el formulario de solicitud desde **http://farseeingresearch.eu/**
     
 
-El proyecto fue financiado por la **Unión Europea** (7th Framework Programme) y en 2018 fue reconocido por el **Innovation Radar de la UE** como uno de los tres proyectos europeos más influyentes.[[ehtel](https://www.ehtel.eu/activities/eu-funded-projects/farseeing.html)]
+El proyecto fue financiado por la **Unión Europea** (7th Framework Programme) y en 2018 fue reconocido por el **Innovation Radar de la UE** como uno de los tres proyectos europeos más influyentes.[ehtel](https://www.ehtel.eu/activities/eu-funded-projects/farseeing.html)
 
 
 
@@ -137,11 +137,11 @@ El proyecto fue financiado por la **Unión Europea** (7th Framework Programme) y
 
 ## Orden de contacto
 
-1. **Jochen Klenk / FARSEEING database manager**. Es el contacto más directo para acceso al dataset y para dudas sobre la solicitud.[[ispgr](https://ispgr.org/the-farseeing-real-world-fall-repository/)]
+1. **Jochen Klenk / FARSEEING database manager**. Es el contacto más directo para acceso al dataset y para dudas sobre la solicitud.[ispgr](https://ispgr.org/the-farseeing-real-world-fall-repository/)
     
-2. **Anisoara Ionescu / EPFL contact person**. La página de EPFL la identifica como persona de contacto del proyecto, así que conviene copiarla en la segunda etapa o escribirle si no responden.[[epfl](https://www.epfl.ch/labs/lmam/page-125471-en-html/page-125543-en-html/page-125553-en-html/page-73892-en-html/)]
+2. **Anisoara Ionescu / EPFL contact person**. La página de EPFL la identifica como persona de contacto del proyecto, así que conviene copiarla en la segunda etapa o escribirle si no responden.[epfl](https://www.epfl.ch/labs/lmam/page-125471-en-html/page-125543-en-html/page-125553-en-html/page-73892-en-html/)
     
-3. **Profesional de apoyo en EPFL/FAR** si hace falta escalar la consulta, usando los contactos generales del laboratorio de EPFL cuando corresponda.[[epfl](https://www.epfl.ch/labs/lmam/page-46172-en-html/)]
+3. **Profesional de apoyo en EPFL/FAR** si hace falta escalar la consulta, usando los contactos generales del laboratorio de EPFL cuando corresponda.[epfl](https://www.epfl.ch/labs/lmam/page-46172-en-html/)
     
 
 ## Datos para el formulario
@@ -225,7 +225,7 @@ Department of Information Systems Engineering
 
 ## Correo 3
 
-Si tampoco hay respuesta, el tercer paso es escribir a la **general contact address of the Robert Bosch Hospital** and ask that the message be forwarded to Jochen Klenk. Esa institución figura como el lugar de trabajo de Klenk y tiene un contacto institucional público.[[bioregio-stern](https://www.bioregio-stern.de/en/database/company/robert-bosch-hospital)]
+Si tampoco hay respuesta, el tercer paso es escribir a la **general contact address of the Robert Bosch Hospital** and ask that the message be forwarded to Jochen Klenk. Esa institución figura como el lugar de trabajo de Klenk y tiene un contacto institucional público.[bioregio-stern](https://www.bioregio-stern.de/en/database/company/robert-bosch-hospital)
 
 **Subject:** Request to forward FARSEEING data access message to Dr. Jochen Klenk
 
@@ -257,6 +257,6 @@ Para que el formulario quede más convincente, conviene que el resumen sea concr
 
 ## Recomendación práctica
 
-En tu caso, yo enviaría primero el correo a **Jochen Klenk**, con el formulario adjunto, y dejaría en copia a una dirección institucional si la tienes. Si no obtienes respuesta en 7 a 10 días hábiles, reenviaría a **Anisoara Ionescu** y después haría un seguimiento institucional al RBK.[[ispgr](https://ispgr.org/the-farseeing-real-world-fall-repository/)]
+En tu caso, yo enviaría primero el correo a **Jochen Klenk**, con el formulario adjunto, y dejaría en copia a una dirección institucional si la tienes. Si no obtienes respuesta en 7 a 10 días hábiles, reenviaría a **Anisoara Ionescu** y después haría un seguimiento institucional al RBK.[ispgr](https://ispgr.org/the-farseeing-real-world-fall-repository/)
 
 También es importante que, si te aprueban el acceso, en futuras publicaciones nombres el dataset FARSEEING y mantengas informado al data manager, porque eso está explícitamente en los términos del formulario.

@@ -1,7 +1,7 @@
 
 - Referencia general: https://github.com/1saifj/Fall-Detection-System-SisFall-Dataset-Raspberry-Pi
 * Paper online: https://pmc.ncbi.nlm.nih.gov/articles/PMC5298771/
-* [[SisFall - A Fall and Movement Dataset|Paper local]]
+* [Paper local](../../02_FUENTES/SisFall%20-%20A%20Fall%20and%20Movement%20Dataset.md)
 * Descarga oficial (no anda): http://sistemic.udea.edu.co/investigacion/proyectos/english-falls/?lang=en
 * Descarga en Kaggle: https://www.kaggle.com/datasets/nvnikhil0001/sis-fall-original-dataset
 
@@ -155,7 +155,7 @@ Los datos se registraron con **tres sensores (2 acelerómetros y 1 giroscopio)**
 El dispositivo se fijó en la **cintura** de los participantes:
 * Justificación: Esta ubicación proporciona alta distinción entre actividades para un sistema de acelerómetro único.
 
-![[sisfall-ubicacion-dispositivo.jpg]]
+![sisfall-ubicacion-dispositivo](../../img/sisfall-ubicacion-dispositivo.jpg)
 
 *Para su estudio, sólo usaron los datos obtenidos recibidos por el sensor **Acelerómetro (ADXL345)**, pero los datos de este y de los otros dos sensores estan disponibles en el dataset*.
 

@@ -11,8 +11,8 @@ tags:
 ## Cómo se mide
 Aunque el pulso se puede medir de forma táctil y manual utilizando las manos, en los sistemas de monitoreo moderno y dispositivos del Internet de las Cosas Médicas (IoMT) se utilizan sensores electrónicos:
 
-- **[[Fotopletismografía (PPG)]]:** Es el método principal utilizado en _wearables_ (como relojes inteligentes), el cual consiste en una medición óptica de los cambios en el volumen de la sangre en los tejidos.
-- **[[Oximetría de Pulso (SpO2)|Oxímetros de pulso]]:** Por lo general, la frecuencia cardíaca se mide de forma combinada con el nivel de oxígeno en la sangre utilizando el mismo componente (como los sensores MAX30100 o [[SpO2 y Oximetría (MAX30102)|MAX30102]]). Para optimizar la medición del ritmo cardíaco, los sensores PPG utilizan un **LED de luz verde** emparejado con un fotodiodo. Se prioriza la luz verde porque es **menos susceptible a sufrir interferencias o artefactos por el movimiento** del paciente en comparación con otros espectros de luz.
+- **[Fotopletismografía (PPG)](Fotopletismografía%20%28PPG%29.md):** Es el método principal utilizado en _wearables_ (como relojes inteligentes), el cual consiste en una medición óptica de los cambios en el volumen de la sangre en los tejidos.
+- **[Oxímetros de pulso](Oximetría%20de%20Pulso%20%28SpO2%29.md):** Por lo general, la frecuencia cardíaca se mide de forma combinada con el nivel de oxígeno en la sangre utilizando el mismo componente (como los sensores MAX30100 o [MAX30102](../Prototipo/SpO2%20y%20Oximetría%20%28MAX30102%29.md)). Para optimizar la medición del ritmo cardíaco, los sensores PPG utilizan un **LED de luz verde** emparejado con un fotodiodo. Se prioriza la luz verde porque es **menos susceptible a sufrir interferencias o artefactos por el movimiento** del paciente en comparación con otros espectros de luz.
 - **Sensores alternativos:** También se emplean combinaciones de resistencias dependientes de luz (LDR) y sensores piezoeléctricos para registrar la frecuencia cardíaca, los cuales han demostrado ser soluciones sumamente adecuadas y de bajo costo.
 
 ---

@@ -1,3 +1,7 @@
+# FASE 3 - SENSORES FÍSICOS
+
+> **Estado:** ⬜ Pendiente (plan original; el trabajo actual avanza por módulos — ver [tablero de avance](../README.md#tablero-de-avance)).
+
 - **Condiciones:** Acá sí se necesita hardware - ESP32 + sensores.
 
 - **Objetivo: Conectar los sensores físicos.** Con los modelos ya validados en las fases anteriores, llega el momento de conectar los sensores reales. En esta fase el objetivo no es que todo funcione perfecto, sino que cada sensor genere datos que el modelo pueda procesar.
