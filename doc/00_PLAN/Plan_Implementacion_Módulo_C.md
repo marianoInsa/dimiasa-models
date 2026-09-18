@@ -68,6 +68,7 @@ El target `PPG cruda → SpO2%` exige canales Rojo/IR y ground truth independien
 
 ## 5. Referencias
 
+- Argüello-Prada, E. J., & Castillo García, J. F. (2024). Machine learning applied to reference signal-less detection of motion artifacts in photoplethysmographic signals: A review. *Sensors, 24*(22), Article 7193. https://doi.org/10.3390/s24227193
 - Bland, J. M., & Altman, D. G. (1986). Statistical methods for assessing agreement between two methods of clinical measurement. *The Lancet, 327*(8476), 307–310. https://doi.org/10.1016/S0140-6736(86)90837-8
 - Cabanas, A. M., Valderrama Sáez, N. M., Collao-Caiconte, P. O., Martín-Escudero, P., Pagán, J., Jiménez-Herranz, E., & Ayala, J. L. (2024). Evaluating AI methods for pulse oximetry: Performance, clinical accuracy, and comprehensive bias analysis. *Bioengineering, 11*(11), Article 1061. https://doi.org/10.3390/bioengineering11111061
 - Charlton, P. H., et al. (2023). The 2023 wearable photoplethysmography roadmap. *Physiological Measurement, 44*(11), Article 111001. https://doi.org/10.1088/1361-6579/acead2

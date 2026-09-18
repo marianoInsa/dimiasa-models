@@ -76,7 +76,7 @@ Un solo CSV de ventanas concentra SQI y FC (decisión de diseño del plan): evit
 
 ## 3. Datos de entrada y capa bronce
 
-`BIDMC-Reduced.csv` (155.13 MB, SHA256 `C4592C48…A3B0`) con esquema exacto:
+`BIDMC-Reduced.csv` (155.13 MiB, 162 660 421 bytes; SHA256 `C4592C48…A3B0`) con esquema exacto:
 
 ```text
 Record,Subject,Sample_Index,Time_s,PLETH,HR,PULSE,RR,SpO2
@@ -254,7 +254,7 @@ $$ \text{Quality\_Flag} = \begin{cases} \text{low-quality} & \text{si hay flag d
 | Registros con las 119 ventanas `ok`              | 15 de 53                    |
 | Peor registro (`low-quality`/119)                | `bidmc_40` (53), `bidmc_41` (46), `bidmc_19` (37), `bidmc_45` (36) |
 
-Las 412 se descomponen en 356 ventanas que fallan exactamente dos criterios (302 SQI+SNR, 38 SQI+AC/DC, 16 SNR+AC/DC) y 56 que fallan los tres; el único flag duro cae dentro de las 56. La única ventana sin FC es `bidmc_44`, ventana 73 (`T_start_s = 292`), con `N_Peaks = 1`, SQI `NaN`, SNR −1.37 dB y AC/DC 11.06 %: el flag duro la marca `low-quality` y `HR_est` queda `NaN`. La política tolera una falla por percentil (1 013 ventanas `ok` con un criterio en rojo) y solo descarta cuando hay dos o más, o un indicio duro de que la ventana no tiene señal analizable.
+Las 412 se descomponen en 356 ventanas que fallan exactamente dos criterios (302 SQI+SNR, 38 SQI+AC/DC, 16 SNR+AC/DC) y 56 que fallan los tres. La única ventana con flag duro es también la única sin FC: `bidmc_44`, ventana 73 (`T_start_s = 292`), con `N_Peaks = 1`, SQI `NaN`, SNR −1.37 dB y AC/DC 11.06 %. Su SQI `NaN` no cuenta como falla —el criterio solo falla con `N_Peaks ≥ 2`—, de modo que cae en las 356 por el par SNR+AC/DC, no entre las 56. El flag duro la marca `low-quality` y `HR_est` queda `NaN`. La política tolera una falla por percentil (1 013 ventanas `ok` con un criterio en rojo) y solo descarta cuando hay dos o más, o un indicio duro de que la ventana no tiene señal analizable.
 
 ---
 
