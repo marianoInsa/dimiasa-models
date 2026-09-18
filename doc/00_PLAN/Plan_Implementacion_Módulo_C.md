@@ -10,7 +10,7 @@ notebooks/data/
   plata/ppg/    ← SQI por ventana + cobertura SpO2 + mapeo canales (JSON/CSV)
   oro/ppg/      ← set_a.parquet (BIDMC) + set_b.parquet (combinado) a 125 Hz
   modelos/ppg/  ← set_{a,b}_final(.keras, _scaler.joblib, comparison_results.json) + variantes _gpu
-notebooks/pipeline/
+notebooks/fase_1/
   00_Preprocesamiento-PPG.ipynb
   01_Entrenamiento-SpO2.ipynb        (CPU, subsampleo)
   01-Entrenamiento-SpO2-GPU.ipynb    (GPU, completo)

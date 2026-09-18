@@ -2,7 +2,7 @@
 
 > **Estado de verificación:** Cada referencia fue contrastada contra su registro editorial (septiembre de 2026); las afirmaciones sin respaldo directo en la literatura se marcan como decisiones propias del pipeline. Las fuentes primarias del proyecto se citan por su publicación oficial y tienen prioridad interpretativa sobre el resto de la bibliografía; la sección 15 mapea decisión por decisión.
 
-Este documento describe, paso a paso y con su fundamento teórico, el pipeline de entrenamiento implementado en [01_Entrenamiento.ipynb](../../notebooks/pipeline/01_Entrenamiento.ipynb) (variante CPU, cuyos artefactos se describen en este documento: `comparison_results.json`, `set_{a,b}_final.keras` y `set_{a,b}_scaler.joblib`). El código del notebook es la fuente de verdad: cada vez que el texto descriptivo del propio notebook discrepa del código ejecutable, acá se documenta el código y la discrepancia se señala de forma explícita.
+Este documento describe, paso a paso y con su fundamento teórico, el pipeline de entrenamiento implementado en [01_Entrenamiento.ipynb](../../notebooks/fase_1/01_Entrenamiento.ipynb) (variante CPU, cuyos artefactos se describen en este documento: `comparison_results.json`, `set_{a,b}_final.keras` y `set_{a,b}_scaler.joblib`). El código del notebook es la fuente de verdad: cada vez que el texto descriptivo del propio notebook discrepa del código ejecutable, acá se documenta el código y la discrepancia se señala de forma explícita.
 
 ## 1. Introducción: de la capa oro al clasificador de ventanas
 
