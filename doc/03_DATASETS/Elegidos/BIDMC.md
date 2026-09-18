@@ -57,7 +57,7 @@ Resumen fiel; el detalle completo está en `datasets\ppg\unify\SPEC_bidmc.md`.
 
 # Rol en Módulo C
 
-`set_a` del pipeline C1 (validación de procesamiento PPG, FC y calidad). El entrenamiento SpO2 queda bloqueado hasta contar con GT independiente (ver `doc/00_PLAN/Plan_Implementacion_Módulo_C.md`).
+`set_a` del pipeline C1: **ejecutado 18-sep-2026** (commit `5ee0d6b`). Resultados: 6 307 ventanas (5 895 `ok` / 412 `low-quality`), FC global MAE 2.2344 bpm / RMSE 5.4574 / Pearson 0.9186 / sesgo −1.0639 bpm; dispersión per-record MAE 0.1982–12.2194 (limitación documentada). Notebook `notebooks/fase_1/modulo_c_ppg/00_Preprocesamiento-PPG.ipynb`, documentación en [preprocesamiento-ppg](../../04_PIPELINE/preprocesamiento-ppg.md), artefactos en `notebooks/data/plata/ppg/` y `notebooks/data/oro/ppg/set_a.parquet`. El entrenamiento SpO2 (C2) sigue bloqueado hasta contar con GT independiente y canales Rojo/IR (ver `doc/00_PLAN/Plan_Implementacion_Módulo_C.md`).
 
 # Reproducción
 

@@ -1,6 +1,6 @@
 # Módulo C — Plan de Implementación C1 (Preprocesamiento PPG, FC y calidad)
 
-> **Estado:** planificado (18-sep-2026). Alcance **C1 = pipeline PPG + validación de FC/calidad sobre BIDMC**, sin modelo SpO2 (C2 bloqueado: BIDMC no tiene Rojo/IR ni ground truth independiente). Réplica la arquitectura Módulo A (`bronce/plata/oro`). Fs **125 Hz** nativa (sin resampleo). Todo umbral citado; lo no probado va como nota o decisión propia explícita.
+> **Estado:** ejecutado 18-sep-2026 (commit `5ee0d6b`). Alcance **C1 = pipeline PPG + validación de FC/calidad sobre BIDMC**, sin modelo SpO2 (C2 bloqueado: BIDMC no tiene Rojo/IR ni ground truth independiente). Réplica la arquitectura Módulo A (`bronce/plata/oro`). Fs **125 Hz** nativa (sin resampleo). Resultados: 6 307 ventanas (5 895 `ok` / 412 `low-quality`), FC global MAE 2.2344 bpm / RMSE 5.4574 / Pearson 0.9186 / sesgo −1.0639 bpm; pipeline y resultados completos en [preprocesamiento-ppg](../04_PIPELINE/preprocesamiento-ppg.md). Todo umbral citado; lo no probado va como nota o decisión propia explícita.
 
 ## 1. Estructura de datos y notebooks
 
@@ -10,7 +10,7 @@ notebooks/fase_1/modulo_c_ppg/
 
 notebooks/data/
   bronce/ppg/   ← BIDMC-Reduced.csv (53 rec / 46 sujetos / 3 180 053 filas) + crudos futuros (ptt-ppg, openox-repo, vitaldb, uq, capnobase, senssmarttech)
-  plata/ppg/    ← bidmc_audit.json + ppg_quality_per_window_125hz.csv + hr_validation_summary.json
+  plata/ppg/    ← bidmc_audit.json + ppg_quality_config.json + ppg_quality_per_window_125hz.csv (SQI+FC) + hr_validation_summary.json + fig_*.png
   oro/ppg/      ← set_a.parquet (BIDMC) a 125 Hz
 ```
 
@@ -30,22 +30,22 @@ Dataset, Subject, Record, Sample_Index, PPG, PPG_Raw, SpO2_Ref, HR_Ref, RR_Ref
 | # | Celda | Contenido |
 |---|-------|-----------|
 | 1 | MD cabecera | Alcance C1, límites de BIDMC, citas (Pimentel 2017; Makowski 2021; Elgendi 2013), enlaces a `BIDMC.md` y a este plan |
-| 2 | Config | Paths `../../data/{bronce,plata,oro}/ppg`; `FS=125`, `WINDOW_S=8`, `STEP_S=4`, `BANDPASS=(0.5, 8)` Hz orden 4, rangos de auditoría SpO2 70-100 / HR 30-220 / RR 4-60, `SEED=42` |
+| 2 | Config | Paths `../../data/{bronce,plata,oro}/ppg`; `FS=125`, `WINDOW_S=8`, `STEP_S=4`, `BANDPASS=(0.5, 8)` Hz (banda de `nk.ppg_clean` y de la SNR), rangos de auditoría SpO2 70-100 / HR 30-220 / RR 4-60, `SEED=42` |
 | 3 | Ingesta | CSV reducido; asserts de esquema y conteos (53 records / 46 sujetos / 3 180 053 filas); PLETH a float32 por registro |
 | 4 | Auditoría física | NaN (D10 ⇒ 0), flatline, valores fuera de rango, AC/DC de perfusión por registro, cobertura de numéricos → `plata/ppg/bidmc_audit.json` |
-| 5 | Filtrado | Butterworth orden 4 zero-phase 0.5-8 Hz (`sosfiltfilt`) por registro; se conservan crudo y filtrado |
+| 5 | Filtrado | `nk.ppg_clean(method="elgendi")` por registro (Butterworth 2.º, pasa-banda 0.5-8 Hz, fase cero `sosfiltfilt`; Elgendi 2013); se conservan crudo (`PPG_Raw`) y filtrado (`PPG`) |
 | 6 | Ventaneo | 8 s (1 000 muestras), paso 4 s (500), por registro |
-| 7 | SQI por ventana | NeuroKit2 `ppg_peaks(method="elgendi")` + `ppg_quality(method="templatematch")`; propias: SNR Welch 0.5-8 Hz, skewness/kurtosis, AC/DC, dropout/flatline; `Quality_Flag` con política OR≥2 |
-| 8 | Validación FC | `HR_Ref` = media de HR en ventana vs FC estimada por picos; MAE/RMSE, Pearson, Bland-Altman por registro y global → `plata/ppg/hr_validation_windows_125hz.csv` + `hr_validation_summary.json` + figuras |
+| 7 | SQI por ventana | NeuroKit2 `ppg_peaks(method="elgendi")` + `ppg_quality(method="templatematch")` por pulso (vector por muestra en NK2 0.2.13 ⇒ `q[peaks]`); propias: SNR Welch 0.5-8 Hz, skewness/kurtosis, AC/DC; `Quality_Flag`: flags duros (`N_Peaks<2`, dropout, flatline) fuerzan `low-quality`; si no, OR≥2 entre los 3 criterios por percentil P10 |
+| 8 | Validación FC | `HR_Ref` = media de HR en ventana vs FC estimada por picos; MAE/RMSE, Pearson, Bland-Altman por registro y global → `plata/ppg/hr_validation_summary.json` + figuras (las métricas por ventana van al CSV único de la celda 10) |
 | 9 | EDA | Histograma SpO2 (colapso normoxia 83-100), HR/RR, morfología media (muesca dicrota), tasas SQI/flags, AC/DC |
 | 10 | Export | `oro/ppg/set_a.parquet` + `plata/ppg/ppg_quality_per_window_125hz.csv`; asserts de conteos y no-NaN |
 | 11 | MD cierre | Resultados, limitaciones y estado C2 |
 
-**Decisiones de la celda 5.** Banda 0.5-8 Hz: Elgendi et al. (2013) la reporta como banda óptima para detección de picos sistólicos (Butterworth 2º zero-phase). Orden 4 zero-phase: coherencia con el preprocesamiento del Módulo A (`sosfiltfilt`).
+**Decisiones de la celda 5.** Se reemplaza el filtro propio del borrador (Butterworth orden 4) por `nk.ppg_clean(method="elgendi")`, refinamiento aprobado antes de implementar: banda 0.5-8 Hz y Butterworth de 2.º orden con fase cero (`sosfiltfilt`) tal como lo entrega NeuroKit2 0.2.13, que es la banda que Elgendi et al. (2013) reporta como óptima para detección de picos sistólicos. El doble pasaje equivale en magnitud a un orden 4 sin distorsión de fase.
 
-**Decisiones de la celda 6.** Ventana 8 s / paso 4 s es decisión propia: a FC 60-90 bpm cubre ~8-12 pulsos, 1 000 muestras float32 = 4 KB/canal (apto SRAM objetivo), y el solape 50 % replica el criterio del Módulo A. BIDMC (480 s/registro) ⇒ ~118 ventanas/registro, ~6 250 en total. La cobertura SpO2 ≥90 % por ventana no aplica a BIDMC: los numéricos vienen en step-hold con faltantes imputados en la reducción (D5/D10), por lo que la cobertura es 100 % por construcción; el gate queda documentado para los datasets de `set_b` (C2).
+**Decisiones de la celda 6.** Ventana 8 s / paso 4 s es decisión propia: a FC 60-90 bpm cubre ~8-12 pulsos, 1 000 muestras float32 = 4 KB/canal (apto SRAM objetivo), y el solape 50 % replica el criterio del Módulo A. BIDMC (480 s/registro) ⇒ 119 ventanas/registro, 6 307 en total. La cobertura SpO2 ≥90 % por ventana no aplica a BIDMC: los numéricos vienen en step-hold con faltantes imputados en la reducción (D5/D10), por lo que la cobertura es 100 % por construcción; el gate queda documentado para los datasets de `set_b` (C2).
 
-**Decisiones de la celda 7.** Detección de picos: método Elgendi (Elgendi et al., 2013) vía NeuroKit2 (Makowski et al., 2021). SQI: `templatematch` de NeuroKit2 (Makowski et al., 2021) más SNR en banda de pulso, skewness/kurtosis y perfusión AC/DC, consistentes con las revisiones de calidad PPG (Desquins et al., 2022; Argüello-Prada & Castillo García, 2024; Charlton et al., 2023). Los umbrales del `Quality_Flag` (OR≥2, análogo al Módulo A) salen de percentiles de la EDA; no se inventan valores fijos. `motion` no se calcula: BIDMC no trae ACC (limitación registrada en `BIDMC.md`).
+**Decisiones de la celda 7.** Detección de picos: método Elgendi (Elgendi et al., 2013) vía NeuroKit2 (Makowski et al., 2021). SQI: `templatematch` de NeuroKit2 (Makowski et al., 2021) más SNR en banda de pulso, skewness/kurtosis y perfusión AC/DC, consistentes con las revisiones de calidad PPG (Desquins et al., 2022; Argüello-Prada & Castillo García, 2024; Charlton et al., 2023). En NK2 0.2.13 `ppg_quality` devuelve un vector por muestra (interpola la correlación por pulso con step-hold): el SQI por pulso se recupera con `q[peaks]` y el de la ventana es la media de los pulsos cuyo pico cae en ella. `Quality_Flag`: umbrales P10 de SQI, SNR y AC/DC persistidos en `ppg_quality_config.json`; flags duros (`N_Peaks<2`, dropout, flatline) fuerzan `low-quality`; si no, OR≥2 entre los tres criterios por percentil (análogo al Módulo A, sin valores fijos inventados). `motion` no se calcula: BIDMC no trae ACC (limitación registrada en `BIDMC.md`).
 
 **Decisiones de la celda 8.** Concordancia con Bland-Altman (Bland & Altman, 1986). No se fija umbral binario de aprobación: se persisten MAE/RMSE, Pearson, sesgo y límites de concordancia, y la distribución del error. `HR` (no `PULSE`) es la referencia del monitor.
 
@@ -55,10 +55,12 @@ Dataset, Subject, Record, Sample_Index, PPG, PPG_Raw, SpO2_Ref, HR_Ref, RR_Ref
 ## 3. Criterios de aceptación
 
 1. El notebook corre con solo `bronce/ppg/BIDMC-Reduced.csv` (sin WFDB ni crudos).
-2. Conteos verificados: 53 records / 46 sujetos / 3 180 053 filas; ~6 250 ventanas; 0 NaN en oro.
+2. Conteos verificados: 53 records / 46 sujetos / 3 180 053 filas; 6 307 ventanas (5 895 `ok` / 412 `low-quality`); 0 NaN en oro.
 3. FC validada con MAE/RMSE/Pearson/Bland-Altman persistidos y figuras; SQI por ventana persistido.
 4. Sin fuga: `Subject` y `Record` preservados (no hay modelo; el split sujeto-wise queda para C2).
 5. Reproducible: semilla fija y sin pasos manuales.
+
+Verificación 18-sep-2026 (commit `5ee0d6b`): los cinco criterios se cumplen; evidencia en [preprocesamiento-ppg](../04_PIPELINE/preprocesamiento-ppg.md).
 
 ## 4. C2 — bloqueado
 

@@ -1,6 +1,6 @@
 # FASE 1 - MODELOS EN PC
 
-> **Estado:** ✅ Módulo A (caídas) completado; ⏭️ Módulo B (ECG) siguiente; ⏸️ Módulo C (SpO2) postergado con alcance acotado — dataset BIDMC unificado 18-sep-2026 (`bronce/ppg/BIDMC-Reduced.csv`), pipeline C1 pendiente. Ver [tablero de avance](../README.md#tablero-de-avance).
+> **Estado:** ✅ Módulo A (caídas) completado; ⏭️ Módulo B (ECG) siguiente; ⏸️ Módulo C (SpO2): **C1 ejecutado 18-sep-2026** (commit `5ee0d6b`) — pipeline PPG + FC/calidad sobre BIDMC, sin modelo SpO2; resultados en [preprocesamiento-ppg](../04_PIPELINE/preprocesamiento-ppg.md); **C2 bloqueado** sin Rojo/IR ni ground truth independiente. Ver [tablero de avance](../README.md#tablero-de-avance).
 
 - **Condiciones:** Sin hardware adicional - todo en Python puro.
 
