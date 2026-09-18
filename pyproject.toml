@@ -16,6 +16,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License"
 ]
 dependencies = [
+    "ai-edge-litert>=2.2.0",
     "azure-storage-file-datalake>=12.25.0",
     "dtaidistance>=2.4.0",
     "greenlet>=3.0.0",
@@ -39,6 +40,9 @@ requires-python = ">=3.10, <3.14"
 
 [project.optional-dependencies]
 dev = [
+    "ipykernel>=6.0",
+    "nbconvert>=7.0",
+    "nbformat>=5.0",
     "pytest>=8.0",
     "pytest-cov",
 ]
