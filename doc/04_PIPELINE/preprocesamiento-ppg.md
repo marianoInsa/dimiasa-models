@@ -94,7 +94,7 @@ Record,Subject,Sample_Index,Time_s,PLETH,HR,PULSE,RR,SpO2
 
 La repetición de sujetos es parte del dataset, no un error: `s03386` ×4, `s11342` ×4, `s25323` ×2, un registro por sujeto en el resto. Implicación de lectura: cualquier split aleatorio por ventana filtraría información entre registros del mismo sujeto; el split sujeto-wise queda declarado para C2.
 
-Límites de la fuente, relevantes para todo lo que sigue: registros de UCI inmóvil con PLETH ya procesada por el monitor (Pimentel et al., 2017); SpO2 en normoxia (83.375–100 %, mayoría 95–100); sin acelerómetro, por lo que no se puede validar SQI de movimiento.
+Límites de la fuente, relevantes para todo lo que sigue: registros de UCI inmóvil con PLETH ya procesada por el monitor (Pimentel et al., 2017); SpO2 en normoxia (83–100 % por muestra, mínimo de las medias por ventana 83.375 % en `bidmc_32` w20; mayoría 95–100); sin acelerómetro, por lo que no se puede validar SQI de movimiento.
 
 ---
 
@@ -239,7 +239,7 @@ $$ \text{Quality\_Flag} = \begin{cases} \text{low-quality} & \text{si hay flag d
 - **Flags duros** (fuerzan `low-quality` sin importar los percentiles): `N_Peaks < 2`, `Dropout` o `Flatline`.
 - **Criterios por percentil**: los tres de la tabla; el OR≥2 aplica solo a ellos.
 - Un SQI `NaN` con `N_Peaks ≥ 2` también cuenta como falla del criterio SQI.
-- El conteo `N_Failures` y la política quedan persistidos en `ppg_quality_config.json`, junto con los conteos `ok`/`low-quality` por registro.
+- El JSON `ppg_quality_config.json` persiste los umbrales, la política, las fallas por criterio (`fail_SQI`, `fail_SNR`, `fail_AC_DC`, `fail_hard`) y los conteos `ok`/`low-quality` por registro; la distribución de `N_Failures` por ventana vive en el CSV, no en el JSON.
 
 ### 8.3 Resultados
 
@@ -348,7 +348,7 @@ La exportación apila los 53 registros en un único DataFrame y escribe `set_a.p
 
 ### 11.2 Limitaciones
 
-- **Normoxia.** SpO2 83.375–100 %, mayoría 95–100: no hay desaturaciones que permitan validar un modelo SpO2, y el propio SpO2 del monitor tiene sesgos conocidos (Sjoding et al., 2020; Cabanas et al., 2024).
+- **Normoxia.** SpO2 83–100 % por muestra (mínimo de las medias por ventana 83.375 %, `bidmc_32` w20; mayoría 95–100): no hay desaturaciones que permitan validar un modelo SpO2, y el propio SpO2 del monitor tiene sesgos conocidos (Sjoding et al., 2020; Cabanas et al., 2024).
 - **UCI inmóvil.** Registros de pacientes en reposo, sin artefactos de movimiento: el SQI de movimiento no se puede validar y BIDMC no trae ACC (limitación registrada en [BIDMC.md](../03_DATASETS/Elegidos/BIDMC.md)).
 - **PLETH monocanal del monitor.** No hay Rojo/IR ni señal cruda del sensor: la entrada ya pasó por el procesamiento del monitor, incluido su filtro y su control de ganancia (Pimentel et al., 2017).
 - **Referencia de FC no independiente.** `HR_Ref` es el `HR` del mismo monitor: la concordancia mide acuerdo con la estimación del monitor, no con una referencia externa (ECG), y está acotada por la calidad de esa referencia.
