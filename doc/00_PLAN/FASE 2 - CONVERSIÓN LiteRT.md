@@ -1,6 +1,6 @@
 # FASE 2 - CONVERSIÓN LiteRT
 
-> **Estado:** ⬜ Pendiente (plan original; el trabajo actual avanza por módulos — ver [tablero de avance](../README.md#tablero-de-avance)).
+> **Estado:** 🔄 En curso — Módulo A (caídas) convertido y cuantizado: `notebooks/fase_2/02_Compresion.ipynb` (fp16 410.3 KB / ~1 ms, paridad 0.0 vs Keras; int8 full 507.1 KB candidato edge; 4.95 MMACs invariantes; estimación ESP32 6–26 ms; citas auditadas contra `doc/02_FUENTES/`). B y C pendientes. Ver [tablero de avance](../README.md#tablero-de-avance).
 
 - **Condiciones:** Aún sin hardware adicional, proceso de cuantización y benchmarking.
 

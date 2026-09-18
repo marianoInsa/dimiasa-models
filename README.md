@@ -18,11 +18,13 @@ El módulo activo implementa un pipeline de **detección de caídas** a partir d
 
 ```
 ├── notebooks/
-│    ├── pipeline/              ← Flujo principal (ejecutar en orden)
+│    ├── fase_1/               ← Preprocesamiento y entrenamiento
 │    │   ├── 00_Preprocesamiento.ipynb
 │    │   ├── 01_Entrenamiento.ipynb
 │    │   ├── 01_Entrenamiento_2.ipynb   ← Cross-dataset (UMAFall como holdout)
 │    │   └── 01-Entrenamiento-GPU.ipynb
+│    ├── fase_2/               ← Compresión (cuantización LiteRT)
+│    │   └── 02_Compresion.ipynb
 │    ├── experiments/           ← Exploración y pruebas
 │    └── data/                  ← Arquitectura de datos
 │        ├── bronce/falls       ← Datos crudos
