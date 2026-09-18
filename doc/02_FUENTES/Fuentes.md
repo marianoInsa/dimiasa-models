@@ -1,6 +1,6 @@
 # Fuentes bibliográficas oficiales del proyecto
 
-> Citas APA 7 de las fuentes primarias disponibles como PDF en esta carpeta (temporales, no versionadas). Son la verdad absoluta del proyecto: respaldan las decisiones de `doc/04_PIPELINE/` y del README.
+> Citas APA 7 de las fuentes primarias del proyecto (los PDF locales son temporales y no versionados; el corpus PPG/SpO2 se verificó por DOI). Son la verdad absoluta del proyecto: respaldan las decisiones de `doc/04_PIPELINE/` y del README.
 > Verificadas contra su registro editorial (sep-2026). Última actualización: 2026-09-18.
 
 ## Preprocesamiento y datasets
@@ -36,6 +36,21 @@
 - Ordóñez, F. J., & Roggen, D. (2016). Deep convolutional and LSTM recurrent neural networks for multimodal wearable activity recognition. *Sensors, 16*(1), Article 115. https://doi.org/10.3390/s16010115
 - Yu, X., Qiu, H., & Xiong, S. (2020). A novel hybrid deep neural network to predict pre-impact fall for older people based on wearable inertial sensors. *Frontiers in Bioengineering and Biotechnology, 8*, Article 63. https://doi.org/10.3389/fbioe.2020.00063
 
+## PPG, oximetría de pulso y SpO2 (Módulo C)
+
+- Argüello-Prada, E. J., & Castillo García, J. F. (2024). Machine learning applied to reference signal-less detection of motion artifacts in photoplethysmographic signals: A review. *Sensors, 24*(22), Article 7193. https://doi.org/10.3390/s24227193
+- Bland, J. M., & Altman, D. G. (1986). Statistical methods for assessing agreement between two methods of clinical measurement. *The Lancet, 327*(8476), 307–310. https://doi.org/10.1016/S0140-6736(86)90837-8
+- Cabanas, A. M., Valderrama Sáez, N. M., Collao-Caiconte, P. O., Martín-Escudero, P., Pagán, J., Jiménez-Herranz, E., & Ayala, J. L. (2024). Evaluating AI methods for pulse oximetry: Performance, clinical accuracy, and comprehensive bias analysis. *Bioengineering, 11*(11), Article 1061. https://doi.org/10.3390/bioengineering11111061
+- Charlton, P. H., Allen, J., Bailón, R., Baker, S., Behar, J. A., Chen, F., Clifford, G. D., Clifton, D. A., Davies, H. J., Ding, C., Ding, X., Dunn, J., Elgendi, M., Ferdoushi, M., Franklin, D., Gil, E., Hassan, M. F., Hernesniemi, J., Hu, X., ... Zhu, T. (2023). The 2023 wearable photoplethysmography roadmap. *Physiological Measurement, 44*(11), Article 111001. https://doi.org/10.1088/1361-6579/acead2
+- Desquins, T., Bousefsaf, F., Pruski, A., & Maaoui, C. (2022). A survey of photoplethysmography and imaging photoplethysmography quality assessment methods. *Applied Sciences, 12*(19), Article 9582. https://doi.org/10.3390/app12199582
+- Elgendi, M., Norton, I., Brearley, M., Abbott, D., & Schuurmans, D. (2013). Systolic peak detection in acceleration photoplethysmograms measured from emergency responders in tropical conditions. *PLoS ONE, 8*(10), Article e76585. https://doi.org/10.1371/journal.pone.0076585
+- Fong, N., Lipnick, M. S., Behnke, E., Chou, Y., Elmankabadi, S., Ortiz, L., Almond, C. S., Auchus, I., Burnett, G. W., Bisegerwa, R., Conrad, D. R., Hendrickson, C. M., Hooli, S., Kopotic, R., Leeb, G., Martin, D., McCollum, E. D., Monk, E. P., Moore, K. L., Jr., ... Law, T. J. (2025). Open access dataset and common data model for pulse oximeter performance data. *Scientific Data, 12*, Article 570. https://doi.org/10.1038/s41597-025-04870-8 · Dataset: OpenOximetry Repository v1.1.1, PhysioNet, https://doi.org/10.13026/be2e-cn29
+- Goda, M. Á., Charlton, P. H., & Behar, J. A. (2024). pyPPG: A Python toolbox for comprehensive photoplethysmography signal analysis. *Physiological Measurement, 45*(4), Article 045001. https://doi.org/10.1088/1361-6579/ad33a2
+- Liang, Z., Zhang, R., Shao, W., Karthik, K., Kourkchi, E., Rafatirad, S., & Homayoun, H. (2025). Rapid adaptation of SpO2 estimation to wearable devices via transfer learning on low-sampling-rate PPG. In *2025 IEEE 21st International Conference on Body Sensor Networks (BSN)* (pp. 1–4). IEEE. https://doi.org/10.48550/arXiv.2509.12515
+- Makowski, D., Pham, T., Lau, Z. J., Brammer, J. C., Lespinasse, F., Pham, H., Schölzel, C., & Chen, S. A. (2021). NeuroKit2: A Python toolbox for neurophysiological signal processing. *Behavior Research Methods, 53*(4), 1689–1696. https://doi.org/10.3758/s13428-020-01516-y
+- Pimentel, M. A. F., Johnson, A. E. W., Charlton, P. H., Birrenkott, D., Watkinson, P. J., Tarassenko, L., & Clifton, D. A. (2017). Toward a robust estimation of respiratory rate from pulse oximeters. *IEEE Transactions on Biomedical Engineering, 64*(8), 1914–1923. https://doi.org/10.1109/TBME.2016.2613124 · Dataset: BIDMC PPG and Respiration Dataset v1.0.0, PhysioNet, https://doi.org/10.13026/C2208R
+- Sjoding, M. W., Dickson, R. P., Iwashyna, T. J., Gay, S. E., & Valley, T. S. (2020). Racial bias in pulse oximetry measurement. *New England Journal of Medicine, 383*(25), 2477–2478. https://doi.org/10.1056/NEJMc2029240
+
 ## Contexto de sistema (IoT, triage, monitoreo remoto)
 
 - Baker, S., Xiang, W., & Atkinson, I. (2017). Internet of Things for smart healthcare: Technologies, challenges, and opportunities. *IEEE Access, 5*, 26521–26544. https://doi.org/10.1109/ACCESS.2017.2775180
@@ -46,7 +61,7 @@
 
 ## Notas de la carpeta
 
-- **24 fuentes** en total: 22 con PDF local y 2 que solo existen como transcripción en esta carpeta (Gramajo et al., 2025 y 2026).
+- **36 fuentes** en total: 24 del corpus caídas/sistema (22 con PDF local y 2 que solo existen como transcripción en esta carpeta: Gramajo et al., 2025 y 2026) y 12 del corpus PPG/SpO2 (Módulo C) verificadas por DOI, sin PDF local.
 - Transcripciones `.md` locales: `KFall`, `SisFall` y `UP-Fall` (duplican su PDF); `Integrated IoT System` y `Multi-Agent Framework` (sin PDF).
 - El PDF de KFall figura con dos nombres de archivo (`A Large-Scale...` y `KFall - A Large-Scale...`): es la misma publicación.
 - Esta carpeta es temporal: no se versiona y no debe enlazarse desde el resto de la documentación (las citas en `doc/04_PIPELINE/` usan DOI/URL oficial, sin rutas locales).

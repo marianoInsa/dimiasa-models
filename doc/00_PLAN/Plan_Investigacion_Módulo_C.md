@@ -8,7 +8,7 @@
 - Enlace: `https://physionet.org/content/bidmc/1.0.0/` — Open Access, 207.7 MB, triple formato WFDB + CSV + MAT.
 - Contenido verificado: 53 registros × 8 min (~7 h), UCI Beth Israel Deaconess. Señales **PPG + ECG Lead II + respiración impedancia a 125 Hz**; numéricos **HR/RR/SpO2 a 1 Hz**; anotación manual de respiraciones por 2 anotadores; extraído de MIMIC-II matched waveform.
 - Cita obligatoria: Pimentel et al. *Towards a Robust Estimation of Respiratory Rate from Pulse Oximeters.* IEEE TBME 64(8):1914-1923, 2017. DOI `10.1109/TBME.2016.2613124`. DOI dataset `10.13026/C2208R`.
-- Rol: **set_a (base)**. Única base liviana con pareja `PPG monocanal 125 Hz + SpO2 numérico 1 Hz` sincronizados, ambos derivados del monitor (sin SaO2 de referencia) → encaja exacto con target ventana 8 s (1.000 muestras) → SpO2 medio. Linaje MIMIC sin DUA. Compatible `pyPPG/NeuroKit2` (ya en `pyproject.toml`) para validar pipeline FASE 1 antes de entrenar.
+- Rol: **set_a (base)**. Única base liviana con pareja `PPG monocanal 125 Hz + SpO2 numérico 1 Hz` sincronizados, ambos derivados del monitor (sin SaO2 de referencia) → encaja exacto con target ventana 8 s (1.000 muestras) → SpO2 medio. Linaje MIMIC sin DUA. Compatible `NeuroKit2` (ya en `pyproject.toml`) para validar pipeline FASE 1 antes de entrenar; `pyPPG` queda bloqueado por NumPy 2 (evidencia y decisión en [Plan_Implementacion_Módulo_C](Plan_Implementacion_Módulo_C.md)).
 - Límite probado: ~7 h, UCI inmóvil, sesgo normoxia 95-100% (colapso de varianza bajo 90%), PPG monocanal procesado por monitor (sin Rojo/IR separados), poco movimiento vs muñeca (conclusión convergente ChatGPT/GEMINI/Sci-Bot C).
 
 ## 2. Candidatos complementarios (open-access)
@@ -38,7 +38,7 @@ Fuentes: Mehrgardt et al. 2022 (PTT DOI `10.13026/jpan-6n92`); Fong et al. *Open
 
 ## 4. Decisión
 
-- **set_a (base): BIDMC solo.** Aceptación: pipeline pyPPG/NeuroKit2 validado + baseline regresión corriendo.
+- **set_a (base): BIDMC solo.** Aceptación: pipeline PPG + validación de FC/calidad (NeuroKit2) + EDA; sin modelo SpO2 en FASE 1 (C2 bloqueado hasta GT independiente).
 - **set_b (generalización): BIDMC + PTT-PPG + OpenOximetry + VitalDB + UQ + CapnoBase (+ SensSmartTech como pretrain movimiento).** Roles: PTT = representación óptica hardware; VitalDB/UQ = fisiología clínica multitarea; OpenOximetry (requiere DUA, decisión pendiente): especialización hipoxia 70-90% solo si se aprueba el acceso; no usable como train bajo el filtro actual; CapnoBase = validación exclusiva de FR (la fuente prohíbe explícitamente entrenar/ajustar algoritmos con él); SensSmartTech = pretrain invariancia movimiento. Apnoea 2026 = desarrollo pipeline Rojo/IR, no train SpO2.
 - **Excluidos:** MIMIC-III Waveform Matched (credentialing + DUA, viola filtro; BIDMC ya aporta su linaje abierto); PPG-DaLiA/WESAD (sin SpO2, solo HR/estrés — futuros si se añade rama FC/estrés); MESA/polisomnografía y altitud 2024-25 (sin DOI/enlace verificable en esta ronda).
 - PPG-DaLiA se cita como existencia probada de CNN 26k params (~32 KB int8, Reiss 2019) para credibilidad <1 MB.

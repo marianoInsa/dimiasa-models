@@ -1,7 +1,7 @@
 <#
 .SYNOPSIS
     Verifica que el entorno Windows esta listo para ejecutar
-    notebooks/fase_1/01-Entrenamiento-GPU.ipynb.
+    notebooks/fase_1/modulo_a_caidas/01-Entrenamiento-GPU.ipynb.
 
 .DESCRIPTION
     Chequea en orden: Python, GPU (NVIDIA/AMD/Intel), driver NVIDIA,
@@ -240,7 +240,7 @@ foreach ($pair in @(@("set_a", $setA), @("set_b", $setB))) {
         Ok "$name.parquet existe ($sizeMB MB)"
     } else {
         Fail "$name.parquet no encontrado en notebooks\data\oro\falls\"
-        Write-Host "        Ejecutar primero notebooks/fase_1/00_Preprocesamiento.ipynb" -ForegroundColor Yellow
+        Write-Host "        Ejecutar primero notebooks/fase_1/modulo_a_caidas/00_Preprocesamiento.ipynb" -ForegroundColor Yellow
         $BLOCKERS++
     }
 }
@@ -266,12 +266,12 @@ try {
 
 # ---- 8. Notebook GPU presente -----------------------------------------------
 Title "Notebook GPU"
-$gpuNb = Join-Path $ProjectRoot "notebooks\fase_1\01-Entrenamiento-GPU.ipynb"
+$gpuNb = Join-Path $ProjectRoot "notebooks\fase_1\modulo_a_caidas\01-Entrenamiento-GPU.ipynb"
 if (Test-Path $gpuNb) {
     $sizeKB = [math]::Round((Get-Item $gpuNb).Length / 1KB, 1)
     Ok "01-Entrenamiento-GPU.ipynb presente ($sizeKB KB)"
 } else {
-    Fail "01-Entrenamiento-GPU.ipynb no encontrado en notebooks\fase_1\"
+    Fail "01-Entrenamiento-GPU.ipynb no encontrado en notebooks\fase_1\modulo_a_caidas\"
     $BLOCKERS++
 }
 
@@ -287,7 +287,7 @@ if ($BLOCKERS -eq 0) {
     Write-Host "    - ~7-12 min por modelo, ~15-25 min totales (2 configs)" -ForegroundColor Gray
     Write-Host ""
     Write-Host "  Siguiente paso:" -ForegroundColor Cyan
-    Write-Host "    jupyter nbconvert --to notebook --execute --inplace notebooks\fase_1\01-Entrenamiento-GPU.ipynb" -ForegroundColor White
+    Write-Host "    jupyter nbconvert --to notebook --execute --inplace notebooks\fase_1\modulo_a_caidas\01-Entrenamiento-GPU.ipynb" -ForegroundColor White
     exit 0
 } else {
     Write-Host "  +---------------------------------------------------------+" -ForegroundColor Red
@@ -298,6 +298,6 @@ if ($BLOCKERS -eq 0) {
     Write-Host "  Guias de setup rapidas:" -ForegroundColor Cyan
     Write-Host "    - NVIDIA:  pip install 'tensorflow[and-cuda]==2.18.*'" -ForegroundColor White
     Write-Host "    - AMD/Intel/NVIDIA sin CUDA:  pip install tensorflow-directml" -ForegroundColor White
-    Write-Host "    - Datos:  ejecutar 00_Preprocesamiento.ipynb" -ForegroundColor White
+    Write-Host "    - Datos:  ejecutar modulo_a_caidas\00_Preprocesamiento.ipynb" -ForegroundColor White
     exit 1
 }

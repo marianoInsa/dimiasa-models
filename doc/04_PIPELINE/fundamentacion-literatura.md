@@ -1,6 +1,6 @@
 # Fundamentación Científica del Pipeline de Caídas
 
-Justificación bibliográfica de las decisiones, métricas y umbrales del pipeline de detección de caídas en adultos mayores (`notebooks/fase_1/00_Preprocesamiento.ipynb` y `notebooks/fase_1/01_Entrenamiento.ipynb`). El detalle técnico de cada etapa vive en [preprocesamiento.md](preprocesamiento.md) y [entrenamiento.md](entrenamiento.md).
+Justificación bibliográfica de las decisiones, métricas y umbrales del pipeline de detección de caídas en adultos mayores (`notebooks/fase_1/modulo_a_caidas/00_Preprocesamiento.ipynb` y `notebooks/fase_1/modulo_a_caidas/01_Entrenamiento.ipynb`). El detalle técnico de cada etapa vive en [preprocesamiento.md](preprocesamiento.md) y [entrenamiento.md](entrenamiento.md).
 
 **Estado de verificación:** cada cita fue validada contra registros Crossref/DOI (agosto–septiembre 2026). Las fuentes primarias del proyecto —los trabajos originales usados para diseñar el pipeline— se citan por su publicación oficial y tienen prioridad interpretativa sobre el resto de la bibliografía. Los detalles atribuidos que no pudieron confirmarse en el texto original se marcan explícitamente.
 

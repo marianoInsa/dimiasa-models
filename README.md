@@ -19,10 +19,13 @@ El módulo activo implementa un pipeline de **detección de caídas** a partir d
 ```
 ├── notebooks/
 │    ├── fase_1/               ← Preprocesamiento y entrenamiento
-│    │   ├── 00_Preprocesamiento.ipynb
-│    │   ├── 01_Entrenamiento.ipynb
-│    │   ├── 01_Entrenamiento_2.ipynb   ← Cross-dataset (UMAFall como holdout)
-│    │   └── 01-Entrenamiento-GPU.ipynb
+│    │   ├── modulo_a_caidas/  ← Módulo A — Caídas (MPU6050)
+│    │   │   ├── 00_Preprocesamiento.ipynb
+│    │   │   ├── 01_Entrenamiento.ipynb
+│    │   │   ├── 01_Entrenamiento_2.ipynb   ← Cross-dataset (UMAFall como holdout)
+│    │   │   └── 01-Entrenamiento-GPU.ipynb
+│    │   ├── modulo_b_ecg/     ← Módulo B — ECG (AD8232)
+│    │   └── modulo_c_ppg/     ← Módulo C — SpO2 (MAX30102)
 │    ├── fase_2/               ← Compresión (cuantización LiteRT)
 │    │   └── 02_Compresion.ipynb
 │    ├── experiments/           ← Exploración y pruebas
@@ -38,7 +41,7 @@ El módulo activo implementa un pipeline de **detección de caídas** a partir d
 └── AGENTS.md
 ```
 
-> **⚠ Requisito previo:** descargar los CSV reducidos `{Dataset}-Reduced.csv` (SisFall, KFall, FallAllD, UPFall, UMAFall) y crear la carpeta `notebooks/data/bronce/falls` para colocarlos allí. Sin esos archivos crudos no es posible ejecutar `00_Preprocesamiento.ipynb`.
+> **⚠ Requisito previo:** descargar los CSV reducidos `{Dataset}-Reduced.csv` (SisFall, KFall, FallAllD, UPFall, UMAFall) y crear la carpeta `notebooks/data/bronce/falls` para colocarlos allí. Sin esos archivos crudos no es posible ejecutar `modulo_a_caidas/00_Preprocesamiento.ipynb`.
 
 ---
 
@@ -56,7 +59,7 @@ El módulo activo implementa un pipeline de **detección de caídas** a partir d
 
 ---
 
-## 🧹 Preprocesamiento (`00_Preprocesamiento.ipynb`)
+## 🧹 Preprocesamiento (`modulo_a_caidas/00_Preprocesamiento.ipynb`)
 
 Pipeline ETL que normaliza los datos crudos a **50 Hz** con esquema estándar de 14 columnas. Organizado en tres capas de almacenamiento:
 
@@ -99,7 +102,7 @@ Ax, Ay, Az, Gx, Gy, Gz, AVM, GVM
 
 ---
 
-## 🧠 Entrenamiento (`01_Entrenamiento.ipynb`) - _sin GPU_
+## 🧠 Entrenamiento (`modulo_a_caidas/01_Entrenamiento.ipynb`) - _sin GPU_
 
 Entrena un modelo **CNN-BiLSTM** de 2 canales (`AVM`, `GVM`) para clasificación binaria `Fall`/`ADL` sobre ventanas de 3 s (150 timesteps, 50 % de solapamiento) construidas a partir de la capa `oro/falls/`.
 
@@ -134,7 +137,7 @@ Entrena un modelo **CNN-BiLSTM** de 2 canales (`AVM`, `GVM`) para clasificación
 
 > Media ± desvío entre los 5 folds de `StratifiedGroupKFold(5)`. Detalle por fold en `comparison_results.json`.
 
-### Cross-dataset (`01_Entrenamiento_2.ipynb`)
+### Cross-dataset (`modulo_a_caidas/01_Entrenamiento_2.ipynb`)
 
 - Entrena una única configuración con los cuatro datasets de `set_b` y evalúa **UMAFall** como holdout externo (4 315 ventanas, 324 de caída).
 
@@ -145,7 +148,7 @@ Entrena un modelo **CNN-BiLSTM** de 2 canales (`AVM`, `GVM`) para clasificación
 
 ---
 
-## 🧪 Entrenamiento (`01-Entrenamiento-GPU.ipynb`) - _con GPU_
+## 🧪 Entrenamiento (`modulo_a_caidas/01-Entrenamiento-GPU.ipynb`) - _con GPU_
 
 Variante experimental del notebook anterior que aprovecha una GPU NVIDIA (Linux nativo o WSL2; en Windows nativo TF ≥ 2.11 no expone GPU). Diferencias clave:
 
@@ -160,7 +163,7 @@ Variante experimental del notebook anterior que aprovecha una GPU NVIDIA (Linux 
 
 ## ✅ Verificación del entorno GPU (`check-gpu-status.ps1`)
 
-Script de PowerShell que verifica si Windows está listo para ejecutar `01-Entrenamiento-GPU.ipynb` (variante experimental). Ejecutar desde la raíz del proyecto:
+Script de PowerShell que verifica si Windows está listo para ejecutar `modulo_a_caidas/01-Entrenamiento-GPU.ipynb` (variante experimental). Ejecutar desde la raíz del proyecto:
 
 ```shell
 .\check-gpu-status.ps1

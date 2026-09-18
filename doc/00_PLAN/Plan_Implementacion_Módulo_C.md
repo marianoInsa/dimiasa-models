@@ -1,57 +1,78 @@
-# Módulo C — Plan de Implementación (Preprocesamiento, EDA y Modelado PPG→SpO2)
+# Módulo C — Plan de Implementación C1 (Preprocesamiento PPG, FC y calidad)
 
-> Réplica arquitectura Módulo A (`bronce/plata/oro` + `00/01` CPU+GPU). Target: **ventana PPG 8 s → SpO2% medio**. Fs común **125 Hz** (nativo BIDMC). Todo umbral citado; lo no probado como nota.
+> **Estado:** planificado (18-sep-2026). Alcance **C1 = pipeline PPG + validación de FC/calidad sobre BIDMC**, sin modelo SpO2 (C2 bloqueado: BIDMC no tiene Rojo/IR ni ground truth independiente). Réplica la arquitectura Módulo A (`bronce/plata/oro`). Fs **125 Hz** nativa (sin resampleo). Todo umbral citado; lo no probado va como nota o decisión propia explícita.
 
 ## 1. Estructura de datos y notebooks
 
 ```text
+notebooks/fase_1/modulo_c_ppg/
+  00_Preprocesamiento-PPG.ipynb   ← único notebook de C1
+
 notebooks/data/
-  bronce/ppg/   ← crudos inmutables (bidmc WFDB/CSV/MAT, ptt-ppg, openox-repo, vitaldb-.vital, uq-csv, capnobase, senssmarttech)
-  plata/ppg/    ← SQI por ventana + cobertura SpO2 + mapeo canales (JSON/CSV)
-  oro/ppg/      ← set_a.parquet (BIDMC) + set_b.parquet (combinado) a 125 Hz
-  modelos/ppg/  ← set_{a,b}_final(.keras, _scaler.joblib, comparison_results.json) + variantes _gpu
-notebooks/fase_1/
-  00_Preprocesamiento-PPG.ipynb
-  01_Entrenamiento-SpO2.ipynb        (CPU, subsampleo)
-  01-Entrenamiento-SpO2-GPU.ipynb    (GPU, completo)
+  bronce/ppg/   ← BIDMC-Reduced.csv (53 rec / 46 sujetos / 3 180 053 filas) + crudos futuros (ptt-ppg, openox-repo, vitaldb, uq, capnobase, senssmarttech)
+  plata/ppg/    ← bidmc_audit.json + ppg_quality_per_window_125hz.csv + hr_validation_summary.json
+  oro/ppg/      ← set_a.parquet (BIDMC) a 125 Hz
 ```
+
+`modelos/ppg/` no se usa en C1 (no hay modelo). El bronce BIDMC se lee del CSV reducido; el crudo WFDB/MAT no se usa (reducción y decisiones D1–D10 en [Elegidos/BIDMC](../03_DATASETS/Elegidos/BIDMC.md)).
 
 Esquema oro (una fila = una muestra a 125 Hz):
 
 ```text
-Dataset, Subject, Sample_Index, PPG, PPG_R, PPG_IR, Dual_Flag, SpO2_Ref, HR_Ref, RR_Ref, SQI
-# PPG monocanal (BIDMC/VitalDB/UQ/Capno) o PPG_R/PPG_IR duales (PTT/SensSmartTech/OpenOx); Dual_Flag 0/1; SpO2_Ref interpolado 1 Hz→125 Hz; SQI ∈ {ok, low-perfusion, motion, dropout}
+Dataset, Subject, Record, Sample_Index, PPG, PPG_Raw, SpO2_Ref, HR_Ref, RR_Ref
+# PPG = PLETH filtrada 0.5-8 Hz (entrada de modelo futura); PPG_Raw = PLETH cruda (auditoría/morfología);
+# SpO2_Ref/HR_Ref/RR_Ref = numéricos 1 Hz en step-hold (D5/D10); HR_Ref usa HR (FC del monitor), no PULSE.
+# Sin PPG_R/PPG_IR/Dual_Flag: BIDMC es PLETH monocanal procesado por monitor (Pimentel et al., 2017).
 ```
 
-## 2. Preprocesamiento (`00_Preprocesamiento-PPG.ipynb`)
+## 2. Notebook C1 (`00_Preprocesamiento-PPG.ipynb`)
 
-1. **Ingesta** — `wfdb` (BIDMC/PTT/SensSmartTech) + CSV (BIDMC/UQ/OpenOx) + MAT (`bidmc_data.mat`) + Vital Recorder export `.vital`→CSV/EDF (VitalDB). Respaldos: Xie 2023 (WFDB), Lee-Jung 2018 (Vital Recorder).
-2. **Auditoría fisiológica** — NaN, flatline, perfusión baja (AC/DC), rangos SpO2 70-100 / HR 30-220 / RR 4-60; reporta cobertura SpO2 por dataset (evidencia sesgo normoxia BIDMC 95-100%).
-3. **Sincronía** — alinea PPG 125 Hz con numéricos 1 Hz (SpO2/HR/RR); exige cobertura SpO2 ≥90% por ventana o se excluye; OpenOximetry SaO2 arterial solo como calibración/evaluación (sujeto a DUA; PPG crudo 86 Hz no sincronizado; ChatGPT-C).
-4. **Métricas fidelidad/SQI por ventana 8 s** — Pearson pre/post resample, SNR banda 0.5-8 Hz (pulso), skewness/kurtosis, tasa dropout, flag motion (ACC donde exista: PTT/SensSmartTech). Persiste `ppg_quality_per_window_125hz.csv` (análogo a `resampling_metrics` de A).
-5. **Filtrado calidad** — descarta ventana si SQI motion/dropout o cobertura SpO2 insuficiente; política OR≥2 análoga a A. No inventa umbrales nuevos: usa percentiles EDA + reglas pyPPG/NeuroKit2 (Goda 2024; Makowski 2021).
-6. **Resampleo** — `resample_poly` Kaiser β=5 a 125 Hz (PTT 500 Hz, VitalDB 500 Hz, CapnoBase 300 Hz, SensSmartTech 100→125 Hz); pasa-banda PPG 0.5-8 Hz preservando muesca dicrota (GEMINI-C: 100 Hz suficiente, 125 Hz unifica).
-7. **Exportación** — `set_a.parquet` (BIDMC) + `set_b.parquet` (combinado con columna Dataset/Dual_Flag).
+| # | Celda | Contenido |
+|---|-------|-----------|
+| 1 | MD cabecera | Alcance C1, límites de BIDMC, citas (Pimentel 2017; Makowski 2021; Elgendi 2013), enlaces a `BIDMC.md` y a este plan |
+| 2 | Config | Paths `../../data/{bronce,plata,oro}/ppg`; `FS=125`, `WINDOW_S=8`, `STEP_S=4`, `BANDPASS=(0.5, 8)` Hz orden 4, rangos de auditoría SpO2 70-100 / HR 30-220 / RR 4-60, `SEED=42` |
+| 3 | Ingesta | CSV reducido; asserts de esquema y conteos (53 records / 46 sujetos / 3 180 053 filas); PLETH a float32 por registro |
+| 4 | Auditoría física | NaN (D10 ⇒ 0), flatline, valores fuera de rango, AC/DC de perfusión por registro, cobertura de numéricos → `plata/ppg/bidmc_audit.json` |
+| 5 | Filtrado | Butterworth orden 4 zero-phase 0.5-8 Hz (`sosfiltfilt`) por registro; se conservan crudo y filtrado |
+| 6 | Ventaneo | 8 s (1 000 muestras), paso 4 s (500), por registro |
+| 7 | SQI por ventana | NeuroKit2 `ppg_peaks(method="elgendi")` + `ppg_quality(method="templatematch")`; propias: SNR Welch 0.5-8 Hz, skewness/kurtosis, AC/DC, dropout/flatline; `Quality_Flag` con política OR≥2 |
+| 8 | Validación FC | `HR_Ref` = media de HR en ventana vs FC estimada por picos; MAE/RMSE, Pearson, Bland-Altman por registro y global → `plata/ppg/hr_validation_windows_125hz.csv` + `hr_validation_summary.json` + figuras |
+| 9 | EDA | Histograma SpO2 (colapso normoxia 83-100), HR/RR, morfología media (muesca dicrota), tasas SQI/flags, AC/DC |
+| 10 | Export | `oro/ppg/set_a.parquet` + `plata/ppg/ppg_quality_per_window_125hz.csv`; asserts de conteos y no-NaN |
+| 11 | MD cierre | Resultados, limitaciones y estado C2 |
 
-## 3. EDA obligatoria
+**Decisiones de la celda 5.** Banda 0.5-8 Hz: Elgendi et al. (2013) la reporta como banda óptima para detección de picos sistólicos (Butterworth 2º zero-phase). Orden 4 zero-phase: coherencia con el preprocesamiento del Módulo A (`sosfiltfilt`).
 
-Histograma SpO2 por dataset (demuestra colapso normoxia vs mesetas OpenOx 70-100%); HR/RR; morfología (muesca dicrota vs fs); tasa SQI por contexto (UCI inmóvil vs ejercicio vs quirófano); dispersión AC/DC y ratio R=`(ACr/DCr)/(ACir/DCir)` donde hay dual (física MAX30102, GEMINI-C) solo descriptiva.
+**Decisiones de la celda 6.** Ventana 8 s / paso 4 s es decisión propia: a FC 60-90 bpm cubre ~8-12 pulsos, 1 000 muestras float32 = 4 KB/canal (apto SRAM objetivo), y el solape 50 % replica el criterio del Módulo A. BIDMC (480 s/registro) ⇒ ~118 ventanas/registro, ~6 250 en total. La cobertura SpO2 ≥90 % por ventana no aplica a BIDMC: los numéricos vienen en step-hold con faltantes imputados en la reducción (D5/D10), por lo que la cobertura es 100 % por construcción; el gate queda documentado para los datasets de `set_b` (C2).
 
-## 4. Ventaneo y modelado (`01_Entrenamiento*.ipynb`)
+**Decisiones de la celda 7.** Detección de picos: método Elgendi (Elgendi et al., 2013) vía NeuroKit2 (Makowski et al., 2021). SQI: `templatematch` de NeuroKit2 (Makowski et al., 2021) más SNR en banda de pulso, skewness/kurtosis y perfusión AC/DC, consistentes con las revisiones de calidad PPG (Desquins et al., 2022; Argüello-Prada & Castillo García, 2024; Charlton et al., 2023). Los umbrales del `Quality_Flag` (OR≥2, análogo al Módulo A) salen de percentiles de la EDA; no se inventan valores fijos. `motion` no se calcula: BIDMC no trae ACC (limitación registrada en `BIDMC.md`).
 
-- **Ventana 8 s (1.000 muestras @125 Hz), paso 4 s (solape 50%).** Target = media SpO2 ventana. Justificación: estándar MIMIC/VitalDB (Sci-Bot-C), ~8-12 pulsos, 4 KB/canal float32 (8 KB dual) apto SRAM.
-- **Split sujeto-wise** — `GroupKFold(K=5)` sobre Subject (estratifica por bin hipoxia <90/90-95/>95); scaler solo train; CapnoBase reservado a validación de FR (no entrenar: la fuente lo prohíbe), OpenOx-hypoxia como hold-out de calibración solo si se aprueba el DUA.
-- **Modelo TCN/1D-CNN** (<1 MB): convoluciones dilatadas causales `RF=1+Σ(k-1)·2^l` o depthwise-separable (ahorro >60% con 2 canales, k=5, GEMINI-C); entrada 1-2 canales ×1000; salida lineal SpO2; loss MSE, monitor MAE; `class`-balance por sobremuestreo ventanas <90%.
-- **Variantes:** CPU = subsampleo acotado por bin, ~12 épocas; GPU = completo, 40 épocas, batch 512, patience 10, `mixed_float16` (igual que A).
-- **Métricas:** MAE/RMSE global + MAE banda <90% (prioridad hipoxemia) + Bland-Altman + Pearson pred-vs-ref; reporta por dataset y dual/monocanal. Referencia de tamaño factible (modelo de FC, no SpO2): CNN 26k params ~32 KB int8 (Reiss 2019 PPG-DaLiA).
-- **Salidas:** `set_{a,b}_final(.keras/_scaler.joblib/comparison_results.json)` + `_gpu`. Conversión LiteRT FASE 2 con QAT calibrado en desaturaciones (GEMINI-C) para no distorsionar AC/DC.
+**Decisiones de la celda 8.** Concordancia con Bland-Altman (Bland & Altman, 1986). No se fija umbral binario de aprobación: se persisten MAE/RMSE, Pearson, sesgo y límites de concordancia, y la distribución del error. `HR` (no `PULSE`) es la referencia del monitor.
 
-## 5. Criterios de aceptación
+> [!IMPORTANT] pyPPG bloqueado en C1 (evidencia reproducida 18-sep-2026)
+> `pyPPG 1.0.14` — única versión resoluble con el stack actual — falla en NumPy 2 (`np.NaN` eliminado) y además no declara `dotmap`; las versiones ≥1.0.15 fijan `numpy==1.23.2`, `scipy==1.9.1` y `pandas==1.4.4`, incompatibles con el proyecto. Falla `FpCollection.get_fiducials` (`fiducials.py:152`) y `get_ppgSQI`. Decisión: C1 usa NeuroKit2 para picos/FC/SQI y se documenta el bloqueo; no se degrada el stack numérico validado de FASE 2 (TF 2.18 / LiteRT 2.2). Reintento en C2 con entorno `numpy<2` o versión futura de pyPPG (Goda et al., 2024).
 
-Pipeline corre con solo `bronce/ppg/bidmc` (set_a); set_b reproduce roles Plan_Investigacion; sin fuga por sujeto; curva pred-vs-ref y Bland-Altman persistidos.
+## 3. Criterios de aceptación
 
-> [!NOTE] Posibles mejoras (no probadas, fuera del trabajo hasta decisión):
-> - Cohorte propia MAX30102 con apneas/ejercicio y regla ≥3% en 10-90 s (Jung 2018 define caída ≥3% y ventana 10-90 s; es detección de eventos, no calibración R→SpO2) para calibrar R→SpO2.
-> - Multitarea PPG→{HR,RR,SpO2,BP} con encoder compartido (VitalDB).
-> - Rama FR 30 s en RPi con CapnoBase + VFC/estrés (WESAD sin SpO2).
-> - Dual-only train (PTT+SensSmartTech+OpenOx) vs monocanal para cuantificar aporte Rojo/IR.
+1. El notebook corre con solo `bronce/ppg/BIDMC-Reduced.csv` (sin WFDB ni crudos).
+2. Conteos verificados: 53 records / 46 sujetos / 3 180 053 filas; ~6 250 ventanas; 0 NaN en oro.
+3. FC validada con MAE/RMSE/Pearson/Bland-Altman persistidos y figuras; SQI por ventana persistido.
+4. Sin fuga: `Subject` y `Record` preservados (no hay modelo; el split sujeto-wise queda para C2).
+5. Reproducible: semilla fija y sin pasos manuales.
+
+## 4. C2 — bloqueado
+
+El target `PPG cruda → SpO2%` exige canales Rojo/IR y ground truth independiente (SaO2 de co-oximetría); BIDMC solo aporta PLETH monocanal y SpO2 del monitor, con sesgo de normoxia (Sjoding et al., 2020; Cabanas et al., 2024). Opciones de desbloqueo: OpenOximetry (requiere DUA; Fong et al., 2025) o cohorte propia con MAX30102. Cuando se desbloquee: ventana 8 s, split sujeto-wise, TCN/1D-CNN <1 MB y QAT calibrado en desaturaciones. Mejoras no probadas (dual-only, multitarea HR/RR/SpO2/BP, rama FR) quedan en [Plan_Investigacion_Módulo_C](Plan_Investigacion_Módulo_C.md).
+
+## 5. Referencias
+
+- Bland, J. M., & Altman, D. G. (1986). Statistical methods for assessing agreement between two methods of clinical measurement. *The Lancet, 327*(8476), 307–310. https://doi.org/10.1016/S0140-6736(86)90837-8
+- Cabanas, A. M., Valderrama Sáez, N. M., Collao-Caiconte, P. O., Martín-Escudero, P., Pagán, J., Jiménez-Herranz, E., & Ayala, J. L. (2024). Evaluating AI methods for pulse oximetry: Performance, clinical accuracy, and comprehensive bias analysis. *Bioengineering, 11*(11), Article 1061. https://doi.org/10.3390/bioengineering11111061
+- Charlton, P. H., et al. (2023). The 2023 wearable photoplethysmography roadmap. *Physiological Measurement, 44*(11), Article 111001. https://doi.org/10.1088/1361-6579/acead2
+- Desquins, T., Bousefsaf, F., Pruski, A., & Maaoui, C. (2022). A survey of photoplethysmography and imaging photoplethysmography quality assessment methods. *Applied Sciences, 12*(19), Article 9582. https://doi.org/10.3390/app12199582
+- Elgendi, M., Norton, I., Brearley, M., Abbott, D., & Schuurmans, D. (2013). Systolic peak detection in acceleration photoplethysmograms measured from emergency responders in tropical conditions. *PLoS ONE, 8*(10), Article e76585. https://doi.org/10.1371/journal.pone.0076585
+- Fong, N., et al. (2025). Open access dataset and common data model for pulse oximeter performance data. *Scientific Data, 12*, Article 570. https://doi.org/10.1038/s41597-025-04870-8
+- Goda, M. Á., Charlton, P. H., & Behar, J. A. (2024). pyPPG: A Python toolbox for comprehensive photoplethysmography signal analysis. *Physiological Measurement, 45*(4), Article 045001. https://doi.org/10.1088/1361-6579/ad33a2
+- Makowski, D., Pham, T., Lau, Z. J., Brammer, J. C., Lespinasse, F., Pham, H., Schölzel, C., & Chen, S. A. (2021). NeuroKit2: A Python toolbox for neurophysiological signal processing. *Behavior Research Methods, 53*(4), 1689–1696. https://doi.org/10.3758/s13428-020-01516-y
+- Pimentel, M. A. F., Johnson, A. E. W., Charlton, P. H., Birrenkott, D., Watkinson, P. J., Tarassenko, L., & Clifton, D. A. (2017). Toward a robust estimation of respiratory rate from pulse oximeters. *IEEE Transactions on Biomedical Engineering, 64*(8), 1914–1923. https://doi.org/10.1109/TBME.2016.2613124
+- Sjoding, M. W., Dickson, R. P., Iwashyna, T. J., Gay, S. E., & Valley, T. S. (2020). Racial bias in pulse oximetry measurement. *New England Journal of Medicine, 383*(25), 2477–2478. https://doi.org/10.1056/NEJMc2029240

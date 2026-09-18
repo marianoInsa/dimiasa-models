@@ -1,6 +1,6 @@
 # FASE 1 - MODELOS EN PC
 
-> **Estado:** ✅ Módulo A (caídas) completado; ⏭️ Módulo B (ECG) siguiente; ⏸️ Módulo C (SpO2) postergado con alcance acotado. Ver [tablero de avance](../README.md#tablero-de-avance).
+> **Estado:** ✅ Módulo A (caídas) completado; ⏭️ Módulo B (ECG) siguiente; ⏸️ Módulo C (SpO2) postergado con alcance acotado — dataset BIDMC unificado 18-sep-2026 (`bronce/ppg/BIDMC-Reduced.csv`), pipeline C1 pendiente. Ver [tablero de avance](../README.md#tablero-de-avance).
 
 - **Condiciones:** Sin hardware adicional - todo en Python puro.
 

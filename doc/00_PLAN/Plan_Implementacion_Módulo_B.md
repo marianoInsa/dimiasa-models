@@ -10,7 +10,7 @@ notebooks/data/
   plata/ecg/    ← métricas calidad por registro + mapeo etiquetas + lista IDs subset (JSON/CSV)
   oro/ecg/      ← set_a.parquet (MITDB) + set_b.parquet (combinado) a 125 Hz
   modelos/ecg/  ← set_{a,b}_final(.keras, _scaler.joblib, comparison_results.json) + variantes _gpu
-notebooks/fase_1/
+notebooks/fase_1/modulo_b_ecg/
   00_Preprocesamiento-ECG.ipynb
   01_Entrenamiento-ECG.ipynb        (CPU, subsampleo acotado)
   01-Entrenamiento-ECG-GPU.ipynb    (GPU, dataset completo)
