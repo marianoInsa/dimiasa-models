@@ -123,7 +123,7 @@ tags: plan
 | **smbus2/RPi.GPIO**    | 3-5               | Drivers I2C para sensores en RPi      |
 | **Mosquitto (MQTT)**   | 4-5               | Comunicación local entre agentes      |
 | **scipy.stats**        | 4-5               | Implementación de fusión bayesiana    |
-| **PhysioNet datasets** | 1                 | MIT-BIH (ECG), BIDMC (PPG/SpO2)       |
+| **PhysioNet datasets** | 1                 | PTB-XL (ECG oficial), BIDMC (PPG/SpO2)       |
 | **SisFall dataset**    | 1                 | Caídas con acelerómetro               |
 
 ---

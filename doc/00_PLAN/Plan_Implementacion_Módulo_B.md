@@ -1,58 +1,63 @@
-# Módulo B — Plan de Implementación (Preprocesamiento, EDA y Modelado ECG)
+# Módulo B — Plan de Implementación (pipeline oficial PTB-XL 250 Hz)
 
-> Réplica la arquitectura Módulo A (`bronce/plata/oro` + `00_Preprocesamiento / 01_Entrenamiento CPU+GPU`). Fs común **125 Hz**. Filtro **0.5-40 Hz** (FASE 1). Todo umbral con respaldo citado; lo no probado va como nota.
+> Pipeline final definitivo. Fuente de verdad: `notebooks/fase_1/modulo_b_ecg/` + artefactos en `notebooks/data/oro/ecg/ptb_xl_250hz_lead_ii/` y `notebooks/data/modelos/ecg/tinyecgnet_ptb_xl_250hz/`. Los notebooks son snapshots de Colab (Drive + GPU T4, TF 2.20.0); no se modifica su contenido.
 
-## 1. Estructura de datos y notebooks
+## 1. Estructura
 
 ```text
-notebooks/data/
-  bronce/ecg/   ← WFDB crudos inmutables (mitdb, challenge-2017, icentia-subset, cpsc2021, shdb-af, ptb-xl-leadI, butqdb-aux)
-  plata/ecg/    ← métricas calidad por registro + mapeo etiquetas + lista IDs subset (JSON/CSV)
-  oro/ecg/      ← set_a.parquet (MITDB) + set_b.parquet (combinado) a 125 Hz
-  modelos/ecg/  ← set_{a,b}_final(.keras, _scaler.joblib, comparison_results.json) + variantes _gpu
 notebooks/fase_1/modulo_b_ecg/
-  00_Preprocesamiento-ECG.ipynb
-  01_Entrenamiento-ECG.ipynb        (CPU, subsampleo acotado)
-  01-Entrenamiento-ECG-GPU.ipynb    (GPU, dataset completo)
+  00_M1_Creacion_Dataset_PTB-XL_Lead-II_250Hz.ipynb
+  01_M2_Entrenamiento_TinyECGNet_Sequential_PTB-XL.ipynb
+notebooks/data/oro/ecg/ptb_xl_250hz_lead_ii/
+  PTB_XL_senal_250Hz_derivacion_II.h5            (20970, 2500)
+  TRAIN_PTB_XL_senal_250Hz_derivacion_II.h5      (16761, 2500)
+  VAL_PTB_XL_senal_250Hz_derivacion_II.h5        (2096, 2500)
+  TEST_PTB_XL_senal_250Hz_derivacion_II.h5       (2113, 2500)
+notebooks/data/modelos/ecg/tinyecgnet_ptb_xl_250hz/
+  mejor_tiny_ecgnet_sequential.keras
+  modelo_final_tiny_ecgnet_sequential.keras
+  results/resultados_test_keras_sequential.npz
+  results/historial_entrenamiento.npy
+  tflite/agent1_tinyecgnet_sequential_fp32.tflite
+  tflite/agent1_tinyecgnet_sequential_int8.tflite
+  firmware/agent1_ecg_sequential_config.h
+  firmware/agent1_tinyecgnet_sequential_int8_model.h
 ```
 
-Esquema oro (14→8 columnas, análogo a las 14 de caídas):
+`notebooks/data/` está ignorado por Git; solo notebooks y docs se versionan.
 
-```text
-Dataset, Subject, Record, Sample_Index, ECG, AAMI_Orig, Label3, Quality_Flag
-# ECG en mV filtrado 0.5-40 Hz a 125 Hz; Label3 ∈ {Normal, Anormal, No-clasificable}; Quality_Flag ∈ {ok, noisy, lead-off}
-```
+## 2. M1 — dataset (sin filtro ni normalización)
 
-## 2. Preprocesamiento (`00_Preprocesamiento-ECG.ipynb`)
+Entrada: ZIP PTB-XL 1.0.3 → `wfdb.rdsamp(filename_hr)`, exige `fs == 500`, presencia de `II` y 5000 muestras. `resample(signal_II, 2500)`, cast `float32`, sin z-score. Salida X `(20970, 2500)`, 0 NaN/Inf, 0 errores. Partición por `strat_fold` con 0 solape de pacientes.
 
-1. **Ingesta** — lee WFDB con `wfdb` desde `bronce/ecg`. Un canal por registro según §3 Plan_Investigacion (MITDB MLII, Icentia Lead I mod., CinC17 single, CPSC Lead I/II, SHDB CC5, PTB-XL Lead I, BUT single).
-2. **Auditoría física** — NaN, flatline (>2 s varianza ~0), saturación (>±5 mV sostenido), ganancia/unidades mV. Reporta tasa por dataset.
-3. **Filtro pasa-banda 0.5-40 Hz** — Butterworth orden 4 zero-phase (`sosfiltfilt`). Respaldo: FASE 1 + estándar QRS (elimina deriva <0.5 Hz y EMG/red >40 Hz) sin distorsionar ST-T para clasificación rítmica.
-4. **Validación y mapeo de etiquetas** — tabla versionada en `plata/ecg/label_map.json`: AAMI N→Normal; VEB/SVEB/F (PVC/PAC/AF/flutter/AT/TSV/MI/STTC/CD/HYP)→Anormal; CinC17 Too Noisy / BUT calidad 3 / lead-off→No-clasificable. Rechaza registros con mezcla incoherente ventana (audita % por dataset como A hacía con Fall/ADL).
-5. **Métricas de fidelidad por registro** (sobre QRS, análogo a AVM/GVM en caídas) — compara original vs resampleado a 125 Hz: SNR banda útil (dB), Pearson r, desfase pico R (ms), atenuación pico R (%), stats pre/post. Persiste `resampling_metrics_per_record_125hz.csv`.
-6. **Filtrado de calidad** — descarta registro/ventana si: Pearson r<0.85, desfase R>100 ms, atenuación>25%, política **OR≥2** (igual que A) o demasiado corto. Umbrales heredados de Módulo A para coherencia metodológica; EDA valida si QRS exige desfase más estricto en iteración futura.
-7. **Resampleo definitivo** — `resample_poly` Kaiser β=5 a 125 Hz (igual que A). Orden: anti-alias → resample → bandpass final.
-8. **Exportación** — `set_a.parquet` (MITDB) + `set_b.parquet` (combinado con columna Dataset para splits y validación externa SHDB-AF).
+## 3. M2 — preprocesamiento, modelo y entrenamiento
 
-## 3. EDA obligatoria (sección del notebook)
+- Preprocesamiento M2 por bloques de 256: bandpass Butterworth orden 4 `0.5–40 Hz` (`sosfiltfilt`) + notch 50 Hz Q30 (`filtfilt`), luego z-score por ECG (`eps 1e-8`). Shape final `(N, 2500, 1)`.
+- Augment solo en entrenamiento: ganancia 0.90–1.10, ruido gaussiano `std 0.01`, shift ±25 muestras; identidad en inferencia (verificado diff 0.0).
+- Arquitectura `Agent1_TinyECGNet_Sequential`: Input `(2500, 1)` → Conv1D 12×k15 s2 + BN + ReLU → SeparableConv1D 16×k15 + BN + ReLU + MaxPool2 + SpatialDropout 0.10 → SeparableConv1D 24×k15 + BN + ReLU + MaxPool2 + SpatialDropout 0.15 → SeparableConv1D 32×k15 + BN + ReLU + MaxPool3 → GlobalAveragePooling1D → Dropout 0.50 → Dense 1 sigmoid. Inferencia: misma red sin capa de augment, 2 673 parámetros.
+- Entrenamiento: `seed 42`, Adam `lr 2e-4`, `BinaryCrossentropy(label_smoothing=0.02)`, batch 64, máx 50 épocas (historial: 30), `ModelCheckpoint(monitor=val_pr_auc)`, `EarlyStopping(patience=6, min_delta=0.002, restore_best)`, `ReduceLROnPlateau(factor=0.5, patience=2, min_lr=1e-6)`.
 
-Distribución Label3 por dataset/sujeto; HR y duración QRS; SNR y tasa No-clasificable; matriz de confusión de anotadores donde aplique (MITDB adjudicado vs Icentia tecnólogos); histogramas Pearson/desfase/atenuación para justificar umbrales §2.6; chequeo shift (MITDB 70s vs SHDB-AF 2019-23).
+## 4. Conversión y firmware
 
-## 4. Ventaneo y modelado (`01_Entrenamiento*.ipynb`)
+- TFLite FP32 desde modelo de inferencia: 20 976 bytes (20.48 KB). Paridad Keras: diff máx 1.788e-07, 0 cambios de clase.
+- INT8 full-integer calibrado con 500 TRAIN (`default_rng(42)`): entrada int8 `[1, 2500, 1]` scale 0.08170621 zp −18; salida int8 `[1, 1]` scale 0.00390625 zp −128. Tamaño 18 584 bytes (18.15 KB). 53 tensores / 34 ops (EXPAND_DIMS, CONV_2D, RESHAPE, DEPTHWISE_CONV_2D, MAX_POOL_2D, MEAN, FULLY_CONNECTED, LOGISTIC, DELEGATE). Memoria de tensores 282 898 bytes (276.27 KB, estimación, no arena TFLite Micro).
+- FP32 vs INT8: diff máx 0.03683, media 0.00738, RMSE 0.009949, 22 clases cambian (1.0412 %).
+- Threshold: float 0.5 → INT8 0 → reconstruido 0.5 exacto. Header C verificado byte-idéntico al `.tflite`.
 
-- **Ventana 10 s (1.250 muestras @125 Hz), solape 50% (5 s).** Justificación: preserva contexto AF/episodio como CinC17 (30 s) y PTB-XL (10 s) pero cabe en SRAM (~5 KB float32 monocanal, cálculo GEMINI-B); etiqueta ventana por ritmo mayoritario, Ruido si Quality_Flag.
-- **Split sujeto-wise** — `StratifiedGroupKFold(K=5)` sobre `Dataset_Subject` + 10% val interna. `StandardScaler` solo en train (igual que A). SHDB-AF reservado como hold-out externo en set_b (no entra en folds).
-- **Modelo 1D-CNN** (<1 MB): Conv1D con referencia `awni/ecg` Stanford (FASE 1); el BiLSTM es añadido propio (el repo original no lo incluye), variante depthwise-separable para ahorrar >60% MACs con 1 canal (GEMINI-B). Salida softmax 3 clases, `CategoricalCrossentropy`, `class_weight` (CPU fijo / GPU dinámico por fold), `EarlyStopping` + `ReduceLROnPlateau`.
-- **Variantes:** CPU = subsampleo 15.000 ventanas/clase, 12 épocas (igual que A); GPU = completo, 40 épocas, batch 512, patience 10, `mixed_float16` si hay GPU (igual que A).
-- **Métricas:** Sensibilidad/Especificidad/Precisión agregadas + matriz 3×3 + top confusiones Anormal; prioridad Sensibilidad (triaje). Reporta además accuracy en SHDB-AF externo.
-- **Salidas:** `set_{a,b}_final(.keras/_scaler.joblib/comparison_results.json)` + variantes `_gpu`. Conversión LiteRT <1 MB queda para FASE 2 (PTQ/QAT int8 reduce ~4×, GEMINI-B).
+## 5. Resultados TEST (n = 2113, threshold 0.5)
 
-## 5. Criterios de aceptación
+| Modelo | Acc | Prec | Sens | Espec | F1 | ROC-AUC | PR-AUC | TN/FP/FN/TP |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Keras | 0.7894 | 0.8853 | 0.7243 | 0.8757 | 0.7967 | 0.882407 | 0.918584 | 796/113/332/872 |
+| TFLite FP32 | 0.7894 | 0.8853 | 0.7243 | 0.8757 | 0.7967 | — | — | idéntico a Keras |
+| TFLite INT8 | 0.7960 | 0.8838 | 0.7392 | 0.8713 | 0.8051 | 0.882092 | 0.917556 | 792/117/314/890 |
 
-Pipeline corre con solo `bronce/ecg/mitdb` (set_a); set_b reproduce roles Plan_Investigacion; sin fuga por sujeto (test de IDs); métricas y matrices persistidas.
+Keras además: FPR 0.1243, FNR 0.2757. Keras `.keras` 118 542 bytes c/u.
 
-> [!NOTE] Posibles mejoras (no probadas, fuera del trabajo hasta decisión):
-> - Ventana dual 2 s beat-centered + 30 s ritmo en ensemble.
-> - Desfase R ≤20 ms en vez de 100 ms (QRS ~80-120 ms) si EDA lo respalda.
-> - Cascada SQA <50 KB previa al diagnóstico con BUT QDB + clase Ruido CinC17.
-> - SSL/contrastivo en Icentia11k + fine-tuning (GEMINI-B) y CutMix1D con ruido real.
+## 6. Criterios de aceptación
+
+Pipeline corre desde HDF5 oficiales; particiones sin fuga por paciente; métricas y matrices persistidas en `.npz`; TFLite + headers generados y verificados.
+
+## 7. Experimento opcional 500 Hz
+
+Notebook separado en `notebooks/experiments/ecg/`, artefactos separados. Mantener 10 s, etiquetas, particiones, semilla e hiperparámetros; entrada `(5000, 1)`. Comparar contra tabla §5. No sobrescribir M1/M2 ni modelos 250 Hz.

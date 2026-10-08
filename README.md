@@ -24,16 +24,20 @@ El módulo activo implementa un pipeline de **detección de caídas** a partir d
 │    │   │   ├── 01_Entrenamiento.ipynb
 │    │   │   ├── 01_Entrenamiento_2.ipynb   ← Cross-dataset (UMAFall como holdout)
 │    │   │   └── 01-Entrenamiento-GPU.ipynb
-│    │   ├── modulo_b_ecg/     ← Módulo B — ECG (AD8232)
+│    │   ├── modulo_b_ecg/     ← Módulo B — ECG (AD8232, pipeline oficial PTB-XL 250 Hz)
+│    │   │   ├── 00_M1_Creacion_Dataset_PTB-XL_Lead-II_250Hz.ipynb
+│    │   │   └── 01_M2_Entrenamiento_TinyECGNet_Sequential_PTB-XL.ipynb
 │    │   └── modulo_c_ppg/     ← Módulo C — SpO2 (MAX30102)
 │    ├── fase_2/               ← Compresión (cuantización LiteRT)
 │    │   └── 02_Compresion.ipynb
 │    ├── experiments/           ← Exploración y pruebas
-│    └── data/                  ← Arquitectura de datos
+│    └── data/                  ← Arquitectura de datos (ignorada por Git)
 │        ├── bronce/falls       ← Datos crudos
 │        ├── plata/falls        ← Métricas
 │        ├── oro/falls          ← Datos maduros para entrenamiento
-│        └── modelos/falls      ← Modelos entrenados (.keras, .joblib, resultados JSON)
+│        ├── modelos/falls      ← Modelos entrenados (.keras, .joblib, resultados JSON)
+│        ├── oro/ecg/ptb_xl_250hz_lead_ii            ← HDF5 PTB-XL Lead II 250 Hz
+│        └── modelos/ecg/tinyecgnet_ptb_xl_250hz     ← Keras, TFLite, firmware y resultados
 │
 ├── doc/                           ← Documentación, diseños y fuentes
 ├── check-gpu-status.ps1           ← Verificación del entorno para entrenar en GPU

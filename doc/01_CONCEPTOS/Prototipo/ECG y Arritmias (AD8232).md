@@ -11,14 +11,10 @@ El módulo AD8232 es un sensor analógico diseñado para medir la actividad elé
 
 ![sensor-ecg](../../img/sensor-ecg.png)
 
-Los datos obtenidos por este sensor son analizados por el "Módulo B", el cual emplea una red neuronal unidimensional ([1D-CNN](Redes%201D-CNN.md)) ultraligera entrenada con la base de datos "MIT-BIH" para clasificar la estabilidad cardíaca y detectar arritmias. En la lógica de triaje cooperativo, el Agente de ECG provee un contexto hemodinámico crucial; su información permite validar emergencias graves al combinarse con otros agentes (como confirmar un síncope si hay hipotensión asociada), o descartar anomalías si un pulso elevado corresponde simplemente a un estado de actividad física normal verificado por el acelerómetro.
+Los datos obtenidos por este sensor son analizados por el "Módulo B", el cual emplea la red TinyECGNet Sequential ([1D-CNN](Redes%201D-CNN.md) separable ultraligera, 2 673 parámetros) entrenada con la base de datos "PTB-XL" (Lead II, 250 Hz, 10 s) para clasificación binaria NORMAL/ANORMAL. En la lógica de triaje cooperativo, el Agente de ECG provee un contexto hemodinámico crucial; su información permite validar emergencias graves al combinarse con otros agentes (como confirmar un síncope si hay hipotensión asociada), o descartar anomalías si un pulso elevado corresponde simplemente a un estado de actividad física normal verificado por el acelerómetro.
 
 #### Links
-* **MIT-BIH Arrhythmia Database (PhysioNet):** El patrón oro indiscutido. Contiene registros de ECG ambulatorios. Es ideal para aplicar segmentación en ventanas, programar los filtros pasa-banda y alimentar arquitecturas convolucionales 1D.
-	* https://physionet.org/content/mitdb/1.0.0/
-	* https://www.kaggle.com/datasets/taejoongyoon/mitbit-arrhythmia-database
-
-* **PTB-XL:** Una base de datos masiva de electrocardiografía clínica con más de 21,000 registros de pacientes reales. Aporta una diversidad morfológica enorme que ayuda a las redes neuronales a generalizar la "línea base" fisiológica y disparar alarmas ante la anomalía con mayor precisión.
+* **PTB-XL (dataset oficial Módulo B):** Base de electrocardiografía clínica con 20 970 ECG utilizables (Lead II, 250 Hz, 10 s) tras filtros de edad y etiqueta binaria NORMAL/ANORMAL. Con ella se entrenó TinyECGNet Sequential (Keras Acc 0.7894 / INT8 Acc 0.7960 en TEST).
 	* https://physionet.org/content/ptb-xl/1.0.3/
 	* https://www.kaggle.com/datasets/khyeh0719/ptb-xl-dataset/code
 

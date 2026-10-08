@@ -1,6 +1,6 @@
 # FASE 1 - MODELOS EN PC
 
-> **Estado:** ✅ Módulo A (caídas) completado; ⏭️ Módulo B (ECG) siguiente; ⏸️ Módulo C (SpO2): **C1 ejecutado 18-sep-2026** (commit `5ee0d6b`) — pipeline PPG + FC/calidad sobre BIDMC, sin modelo SpO2; resultados en [preprocesamiento-ppg](../04_PIPELINE/preprocesamiento-ppg.md); **C2 bloqueado** sin Rojo/IR ni ground truth independiente. Ver [tablero de avance](../README.md#tablero-de-avance).
+> **Estado:** ✅ Módulo A (caídas) completado; ✅ Módulo B (ECG) completado con pipeline oficial PTB-XL Lead II 250 Hz binario + TinyECGNet Sequential (Keras Acc 0.7894 / INT8 Acc 0.7960 en TEST n=2113); ⏸️ Módulo C (SpO2): **C1 ejecutado 18-sep-2026** (commit `5ee0d6b`) — pipeline PPG + FC/calidad sobre BIDMC, sin modelo SpO2; resultados en [preprocesamiento-ppg](../04_PIPELINE/preprocesamiento-ppg.md); **C2 bloqueado** sin Rojo/IR ni ground truth independiente. Ver [tablero de avance](../README.md#tablero-de-avance). Experimento opcional: corrida 500 Hz contra resultados 250 Hz.
 
 - **Condiciones:** Sin hardware adicional - todo en Python puro.
 
@@ -13,13 +13,11 @@
     - Entrenar una red CNN-LSTM simple en Keras para detectar caídas usando los datos de aceleración en los ejes X, Y y Z.
     - Evaluar los modelos utilizando métricas de precisión, recall y F1-score.
     - Punto de partida: Repositorio de referencia 1saifj/Fall-Detection-System-SisFall-Dataset-Raspberry-Pi (>96% precisión con TFLite).
-  - **Módulo B - [ECG y Arritmias (AD8232)](../01_CONCEPTOS/Prototipo/ECG%20y%20Arritmias%20%28AD8232%29.md):**
-    - Descargar el dataset ‘MIT-BIH Arrhythmia Database’ para ECG y Arritmias desde PhysioNet.
-    - Desarrollar un pipeline de ETL, y aplicar técnicas de escalado y segmentación para preparar las señales de ECG.
-    - Aplicar filtros pasa-banda (0.5-40 Hz) y segmentación en ventanas a las señales de ECG.
-    - Entrenar un modelo 1D-CNN liviano para la clasificación de arritmias.
-    - Usar el repositorio awni/ecg de Stanford como referencia de arquitectura.
-    - Meta: Objetivo de tamaño de modelo menor a 1 MB con inferencia menor a 200 ms.
+  - **Módulo B - [ECG y Arritmias (AD8232)](../01_CONCEPTOS/Prototipo/ECG%20y%20Arritmias%20%28AD8232%29.md):** ✅ pipeline oficial PTB-XL Lead II 250 Hz binario (ver [Plan_Implementacion_Módulo_B](Plan_Implementacion_Módulo_B.md))
+    - Dataset PTB-XL 1.0.3 desde PhysioNet: 20 970 ECG (Lead II, 500 Hz → 250 Hz vía `resample`, 10 s / 2500 muestras), etiqueta NORMAL/ANORMAL, particiones TRAIN 16 761 / VAL 2 096 / TEST 2 113 sin solape de pacientes.
+    - Preprocesamiento M2: pasa-banda 0.5-40 Hz + notch 50 Hz y z-score por ECG; augment de entrenamiento (ganancia, ruido, shift).
+    - Modelo TinyECGNet Sequential (SeparableConv1D, 2 673 parámetros): Keras Acc 0.7894 / F1 0.7967; INT8 Acc 0.7960 / F1 0.8051 en TEST.
+    - Entregables: `.keras` 115.76 KB, TFLite FP32 20.48 KB, TFLite INT8 18.15 KB + headers C verificados.
   - **Módulo C - [SpO2 y Oximetría (MAX30102)](../01_CONCEPTOS/Prototipo/SpO2%20y%20Oximetr%C3%ADa%20%28MAX30102%29.md):**
     - Instalar las dependencias pyPPG y NeuroKit2 en el entorno de desarrollo.
     - Cargar el dataset ‘BIDMC’ para SpO2 y Oximetría desde PhysioNet (53 grabaciones ICU con etiquetas SpO2).
