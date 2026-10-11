@@ -14,7 +14,7 @@ Leyenda: ✅ Completado · ⏭️ Siguiente · ⏸️ Postergado · 🔄 En curs
 | [FASE 2 — Conversión LiteRT](00_PLAN/FASE%202%20-%20CONVERSIÓN%20LiteRT.md)             | 🔄 En curso (Módulo A)  | [02_Compresion](../notebooks/fase_2/02_Compresion.ipynb)                                                                                                                                                                                        |
 | [FASE 3 — Sensores físicos](00_PLAN/FASE%203%20-%20SENSORES%20FÍSICOS.md)               | ⬜ Pendiente  | -                                                                                                                                                                                        |
 | [FASE 4 — Sistema multiagente](00_PLAN/FASE%204%20-%20SISTEMA%20MULTIAGENTE.md)         | ⬜ Pendiente  | -                                                                                                                                                                                        |
-| [FASE 5 — Validación experimental](00_PLAN/FASE%205%20-%20VALIDACIÓN%20EXPERIMENTAL.md) | ⬜ Pendiente  | -                                                                                                                                                                                        |
+| [FASE 5 — Validación experimental](00_PLAN/FASE%205%20-%20VALIDACIÓN%20EXPERIMENTAL.md) | ⬜ Pendiente  | [Plan ESP32+Ubuntu](PLAN_VALIDACION_EXPERIMENTAL_AB_ESP32.md) · [baseline sintético Arduino](../firmware/esp32_int8_baseline/esp32_int8_baseline.ino) |
 
 ### Resultados actuales (Módulo A)
 

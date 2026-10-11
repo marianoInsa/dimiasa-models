@@ -1,16 +1,21 @@
 # FASE 5 - VALIDACIÓN EXPERIMENTAL
 
-> **Estado:** ⬜ Pendiente (plan original; el trabajo actual avanza por módulos — ver [tablero de avance](../README.md#tablero-de-avance)).
+> **Estado:** ⬜ Validación con datasets pendiente. El baseline de inferencia sintética está guardado; consultar el [plan vigente A/B para ESP32 y Ubuntu](../PLAN_VALIDACION_EXPERIMENTAL_AB_ESP32.md).
 
-- **Objetivo: Resiliencia y validación experimental.** Lo que diferencia un prototipo de un sistema. Validación de las afirmaciones del paper. Esta última fase valida las afirmaciones más importantes del paper y genera los datos experimentales que la versión actual del paper presenta como proyecciones teóricas.
+## Alcance vigente
 
-- **Pruebas a realizar (Tareas):**
-  - **Medición de latencia real:** Medir la latencia de respuesta ejecutando el procesamiento a nivel local (edge) y compararla contra los tiempos de un envío directo a un servidor en la nube. El paper proyecta una reducción del 70%.
-  - **Resiliencia ante caída de red:** Simular una pérdida de conectividad externa (desconectar el WiFi) para verificar el correcto funcionamiento offline, que el sistema sigue detectando eventos, y el almacenamiento local de las alertas generadas correctamente.
-  - **Tasa de falsos positivos:** Cuantificar y registrar cuántas alarmas genera el sistema sin razonamiento cooperativo (sensor aislado) versus el sistema con razonamiento cooperativo entre agentes.
-  - **Prueba en condiciones ambientales locales:** Replicar variables ambientales locales extremas para validar el ejemplo concreto del paper (ej. exposición a 38°C común en el NEA) con taquicardia leve de 110 bpm, para comprobar la supresión de falsos positivos en las lecturas de ritmo cardíaco (clasificada correctamente como Verde).
-  - Documentar todas las métricas experimentales resultantes para redactar la actualización del apartado de resultados (actualizan la Sección 5 del paper).
+Validar la integridad del protocolo USB/Serial, el preprocesamiento, las inferencias INT8 de los módulos A (caídas) y B (ECG), la regla de triaje y el rendimiento técnico. La ESP32 usa Arduino Core 2.0.17 y `TensorFlowLite_ESP32` 1.0.0; Ubuntu reproduce los datasets seleccionados.
 
-- **Duración:** 50 hs (2-3 semanas).
+## Secuencia
 
-- **Resultados Esperados (Entregable):** Métricas experimentales reales obtenidas de latencia, tasa de falsos positivos y resiliencia ante desconexión para la actualización de la Sección 5 del paper.
+1. Congelar versiones, hashes, contratos de entrada/salida y criterios de aceptación.
+2. Validar los manifiestos y generar la referencia Python de los modelos.
+3. Comprobar el preprocesamiento C/C++ contra SciPy antes de flashear.
+4. Añadir el protocolo serial secuencial y probar cada agente por separado.
+5. Probar las cuatro combinaciones de la tabla de triaje y los casos inválidos.
+6. Ejecutar `smoke`, luego `full`, en reproducción rápida; medir después la reproducción temporizada y los fallos de comunicación.
+7. Guardar resultados, configuración, versiones y hashes para poder repetir la corrida.
+
+## Interpretación
+
+La validación actual no mide sensores físicos, conectividad Wi-Fi/MQTT ni latencia contra la nube. Los escenarios combinan UMAFall y PTB-XL sin sincronía ni identidad común; validan integración y reglas del prototipo, no diagnóstico clínico ni reducción de falsas alarmas en pacientes. Las métricas de caídas son por ventana y no deben leerse como eventos independientes. El trabajo futuro de sensores físicos, red y comparación clínica requiere un protocolo experimental aparte.

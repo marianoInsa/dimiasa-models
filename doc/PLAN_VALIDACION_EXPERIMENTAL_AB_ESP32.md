@@ -1,98 +1,147 @@
-# Validación experimental de los módulos A y B en ESP32
+# Plan de implementación: validación experimental A/B en ESP32 y Ubuntu
 
-**Alcance:** módulos A (caídas, MPU6050) y B (ECG, AD8232). Módulo C y sensores ambientales quedan fuera.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use `superpowers:executing-plans` to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-El plan comprueba captura, inferencia, coordinación y rendimiento técnico. No valida diagnóstico clínico. Los pasos con LiteRT Micro y ESP-IDF se deben ajustar a la placa y al firmware exactos.
+**Goal:** Validar en una ESP32 clásica la integridad de entrada serial, el preprocesamiento, las inferencias INT8 de LiteFallNet y TinyECGNet, la regla de triaje y el rendimiento técnico con los datasets seleccionados.
 
-Las frecuencias y ventanas indicadas vienen de los pipelines del proyecto. Los criterios numéricos de éxito deben acordarse antes de medir; no se fijan pines ni límites no publicados. Una ventana es un tramo fijo de señal que recibe el modelo.
+**Architecture:** Ubuntu valida los manifiestos, calcula la referencia Python y reproduce las señales por USB/Serial. La ESP32 procesa cada bloque secuencialmente con los modelos actuales y devuelve predicciones y tiempos; el host conserva los resultados auditables.
 
-## Pasos e hitos
+**Tech Stack:** Arduino IDE, ESP32 Core 2.0.17, `TensorFlowLite_ESP32` 1.0.0, TensorFlow Lite Micro, Python, NumPy, Pandas y pySerial.
 
-### 1. Identificar placa y firmware
+**Spec:** Este documento contiene el plan aprobado para la Fase 5; el alcance general de la fase está resumido en [`doc/00_PLAN/FASE 5 - VALIDACIÓN EXPERIMENTAL.md`](00_PLAN/FASE%205%20-%20VALIDACI%C3%93N%20EXPERIMENTAL.md).
 
-**Acción:** registrar modelo exacto de ESP32, placa, framework y versión del firmware. Registrar también los modelos de las placas MPU6050 y AD8232. Si se conserva MQTT, indicar dónde estará el broker.
+## Global Constraints
 
-**Advertencia:** “ESP32” no identifica una placa ni sus pines. No elegir pines o conexiones solo con la ficha del chip: revisar la guía de la placa y el esquema de cada módulo.
+- Usar el firmware secuencial y la arena compartida de 80 KiB; no añadir MQTT, concurrencia ni ejecución en varios núcleos.
+- Mantener los modelos, umbrales y conjuntos de prueba sin ajuste durante la evaluación.
+- Las señales ECG y caídas se emparejan artificialmente: los resultados integrados validan el prototipo, no una asociación clínica.
+- Las entradas inválidas, incompletas o ausentes producen `ERROR`/`INDETERMINADO`; nunca `NORMAL`, `ADL` ni una alerta válida.
+- LiteFallNet se ejecuta como candidato de validación experimental. Su gate de producción pendiente no bloquea esta prueba.
+- Usar los datos existentes en `notebooks/data/esp32_simulation/{smoke,full}/`; no modificar los CSV fuente.
 
-**Hito:** ficha del equipo con placa, framework, versiones y ubicación del broker definidos.
+---
 
-### 2. Comprobar que ambos modelos corren en la ESP32
+## Estado inicial y baseline
 
-**Acción:** comprobar que el programa LiteRT para la placa admite las operaciones de ambos modelos y el formato de sus entradas. Cargar primero A y luego B; después probar ambos en una misma sesión. Si el firmware lo requiere, convertir los archivos `.tflite` a datos C incluidos en el programa. Comparar resultados de la placa y de referencia con el mismo archivo de prueba.
+El sketch de prueba sintética está guardado en [`firmware/esp32_int8_baseline/esp32_int8_baseline.ino`](../firmware/esp32_int8_baseline/esp32_int8_baseline.ino). Se conserva como baseline; el reproductor de datasets y el protocolo serial se implementarán aparte.
 
-**Advertencia:** LiteRT para microcontroladores solo admite parte de las operaciones y requiere gestionar memoria manualmente. Un `.tflite` convertido no demuestra por sí mismo que pueda ejecutarse en la placa. El componente de Espressif publica una lista de versiones de ESP-IDF compatibles; respetarla si se elige ese componente.
+La prueba informada usa `TensorFlowLite_ESP32` 1.0.0, ESP32 Core 2.0.17 y una arena compartida de 80 KiB. Con entradas sintéticas, los modelos pasaron comprobación del esquema, registro de operadores, `AllocateTensors()` e `Invoke()`. Valores informados: LiteFallNet `q=-106` (0,0859; actividad normal; ~638 ms), TinyECGNet `q=57` (0,7227; ECG anormal; ~1113 ms) y heap libre de 267.276 a 267.012 bytes. Estos valores son una referencia de integración, no una medición con señales de los datasets.
 
-**Hito:** ambos modelos cargan e infieren; se registran memoria, tiempo y diferencia frente a la referencia. El límite aceptable de diferencia se fija antes de medir.
+Los modelos INT8 y headers están en el almacenamiento local ignorado bajo `notebooks/data/modelos/`. Para compilar el sketch baseline, sus cuatro headers generados deben estar disponibles en el include path de Arduino. El sketch no contiene todavía parser serial ni preprocesamiento de señales reales.
 
-### 3. Verificar captura y preparación de las señales
+## Archivos del trabajo de validación
 
-**Acción:** mantener el formato usado por los modelos:
+- `firmware/esp32_int8_baseline/esp32_int8_baseline.ino` — prueba sintética conservada, no modificar durante la nueva integración.
+- `firmware/esp32_validation/esp32_validation.ino` — arranque y coordinación serial de la prueba con datasets.
+- `firmware/esp32_validation/serial_protocol.{h,cpp}` — parser acotado, validación de mensajes y estado del caso.
+- `firmware/esp32_validation/fall_agent.{h,cpp}` — AVM/GVM, filtro, remuestreo, ventana, cuantización e inferencia.
+- `firmware/esp32_validation/ecg_agent.{h,cpp}` — filtros, z-score, cuantización e inferencia ECG.
+- `firmware/esp32_validation/triage.h` — tabla de decisión independiente del transporte.
+- `scripts/esp32_simulation/reference.py` — referencia Python de preprocesamiento, cuantización e inferencia TFLite.
+- `scripts/esp32_simulation/replay.py` — reproducción rápida/temporizada, comunicación y registro.
+- `tests/test_esp32_simulation.py` — pruebas offline de datos, protocolo y tabla de triaje.
+- `pyproject.toml` — extra opcional de pySerial; NumPy y Pandas ya son dependencias del proyecto.
+- `reports/esp32_validation/<run-id>/` — `results.csv`, `run_metadata.json` y `summary.json` por corrida.
 
-- **A:** AVM y GVM (magnitudes de aceleración y giro), a 50 Hz; ventana de 3 s (150 muestras) y el escalador documentado, guardado por separado del modelo.
-- **B:** ECG Lead II, a 250 Hz; ventana de 10 s (2.500 muestras) y preparación usada durante el entrenamiento.
+`scripts/export_tflite_header.py` ya permite generar headers en un directorio de salida; reutilizarlo, sin duplicar el exportador. Incluir la configuración de cada modelo desde su propia unidad de compilación para aislar sus macros.
 
-Usar la conexión I²C para el MPU6050. Leer la salida analógica del AD8232 con la entrada ADC de la ESP32, que convierte esa señal en datos digitales. Registrar muestras recibidas, tiempos y errores de lectura.
+## Plan por tareas
 
-**Advertencia:** Espressif documenta muestreo continuo, calibración y errores posibles por ruido o por llenar el búfer, lo que puede dejar muestras sin procesar. La guía del ESP32 clásico indica una relación entre ADC2 y Wi-Fi; verificarla para el chip exacto antes de elegir el pin. No cambiar filtros, escalado ni frecuencia sin medir el efecto sobre el modelo.
+### Task 1: Congelar contratos y validar los datos
 
-**Hito:** se forman ventanas completas con las dimensiones esperadas y el registro no presenta muestras perdidas ni desbordes durante la prueba definida.
+**Archivos:** `doc/ESTADO_MODELOS_INT8_ESP32.md`, notebooks de entrenamiento/cuantización, `notebooks/data/esp32_simulation/full/summary.json` y manifiestos.
 
-### 4. Definir y probar la regla entre A y B
+- [ ] Registrar placa exacta, versiones de Arduino IDE/Core/biblioteca, hashes de modelos, configuración de build y puerto serial.
+- [ ] Confirmar forma, escalas, puntos cero, umbrales, unidades y semántica de las dos salidas a partir de los artefactos y notebooks.
+- [ ] Verificar en el código de entrenamiento si LiteFallNet filtra cada trial completo antes de ventanear. La documentación actual recomienda AVM/GVM → `sosfiltfilt` a frecuencia nativa → `resample_poly` a 50 Hz → ventana de 150 muestras con paso 75.
+- [ ] Comparar la regla de `model_target_reference` del manifiesto —pico AVM del trial UMAFall original a 20 Hz— con la regla exacta del entrenamiento. Detener las métricas de clasificación si no coincide; no corregir etiquetas silenciosamente.
+- [ ] Comprobar integridad de claves, filas, índices consecutivos, NaN/Inf, IDs únicos y cardinalidad de las relaciones entre manifiestos y streams.
+- [ ] Acordar antes de medir la tolerancia de paridad y los criterios de latencia; mantener los resultados como mediciones experimentales, no como aprobación de producción.
 
-**Acción:** escribir una tabla corta con todas las combinaciones de salida de A y B y la respuesta esperada del coordinador. Incluir también el caso de salida ausente o señal inválida. Ejecutar pruebas de tabla con resultados preparados antes de conectar inferencia continua.
+**Contrato conocido:** entrada A `[1,150,2]` INT8; entrada B `[1,2500,1]` INT8. La clase ECG positiva es `ANORMAL`, no “caída” ni “taquicardia”.
 
-**Advertencia:** B clasifica ECG como NORMAL/ANORMAL; no informa por sí solo “taquicardia”. La tabla de Fase 4 usa taquicardia y ritmo estable. No equiparar esos términos sin una regla validada y aprobada. Una salida ausente tampoco debe contarse como normal.
+### Task 2: Crear la referencia Python y las pruebas de manifiestos
 
-**Hito:** reglas aprobadas y una prueba automática confirma el resultado esperado para cada combinación.
+**Archivos:** crear `scripts/esp32_simulation/reference.py` y `tests/test_esp32_simulation.py`.
 
-### 5. Reproducir datos de prueba en la ESP32
+- [ ] Escribir primero pruebas que comprueben que `full` contiene 20 trials, 161 ventanas de caída, 40 ECG y 20 escenarios; comprobar también los conteos de `smoke`.
+- [ ] Añadir selección por `trial_id`, `window_id`, `ecg_id` y `scenario_id`, validando las relaciones con `pandas.merge(..., validate=...)` y fallando ante referencias huérfanas.
+- [ ] Generar desde Python los tensores INT8 y las salidas de referencia de ambos modelos con el mismo preprocesamiento y umbrales que el firmware.
+- [ ] Para ECG, usar `adc_count_sim` en la comparación principal; conservar la señal original como referencia secundaria, no mezclar ambas rutas en una misma métrica.
+- [ ] Guardar las salidas de referencia con los IDs de origen para poder distinguir errores de preprocesamiento, inferencia y triaje.
 
-**Acción:** ejecutar los conjuntos de prueba reservados de A y B, conservando sus etiquetas. Comparar dos modos con las mismas entradas: agentes aislados y agentes con coordinador. Guardar señales o identificadores de prueba, salidas de cada modelo, decisión final y tiempos.
+**Verificación:** ejecutar las pruebas offline sin abrir el puerto serial; todos los IDs de `scenario_manifest.csv` deben resolver a una entrada de cada agente.
 
-**Advertencia:** los datos de caídas y ECG provienen de colecciones distintas y no son registros sincronizados de una misma persona. Al combinarlos se prueban escenarios preparados, no una relación clínica real entre ambas señales. Mantener los conjuntos de prueba reservados; no usarlos para ajustar reglas o umbrales.
+### Task 3: Implementar el preprocesamiento y comprobar paridad nativa
 
-**Hito:** existe un registro reproducible de cada prueba y ambas modalidades recibieron las mismas entradas en los dos modos.
+**Archivos:** `firmware/esp32_validation/fall_agent.{h,cpp}`, `ecg_agent.{h,cpp}` y un harness nativo de prueba.
 
-### 6. Medir resultados y desconexión
+- [ ] Exportar desde SciPy los coeficientes y condiciones iniciales de `sosfiltfilt`/`filtfilt`; no aproximar los estados con ceros.
+- [ ] Implementar la ruta de caídas según el orden exacto verificado en Task 1. Si el filtro opera sobre el trial completo, recibir y procesar el trial completo antes de seleccionar las ventanas solicitadas; no filtrar 60 muestras aisladas por defecto.
+- [ ] Implementar ECG en 2.500 muestras: pasa-banda Butterworth de orden 4 (0,5–40 Hz), notch 50 Hz/Q30, z-score por ventana y cuantización con escala `0.081706210970878601` y zero point `-18`.
+- [ ] Comparar el código C/C++ nativo que luego compilará para ESP32 contra SciPy y la referencia Python, incluyendo el tensor INT8.
 
-**Acción:** informar por separado:
+**Criterio propuesto:** error máximo de señal flotante `< 1e-6` y coincidencia exacta de los bytes INT8 de entrada. Registrar cualquier diferencia antes de flashear.
 
-- Para A y B: aciertos y errores por clase (caída/no caída; ECG normal/anormal).
-- Para el sistema: eventos detectados, falsas alarmas por hora y tiempo desde la señal hasta la decisión final.
-- Para ESP32: tiempo de inferencia de cada modelo, tiempo total y errores de captura.
-- Si MQTT forma parte de la prueba: repetir con broker disponible y desconectado; registrar qué decisiones siguen funcionando y qué mensajes se pierden.
+### Task 4: Añadir comunicación serial y ejecución secuencial
 
-**Advertencia:** el pipeline de caídas reporta resultados por ventana y usa ventanas solapadas; no contarlas como eventos independientes. ESP-MQTT documenta un **cliente** MQTT, no un broker Mosquitto. Si se usa MQTT, definir el broker fuera de la ESP32. No afirmar funcionamiento offline hasta probar la ruta completa sin ese enlace. La meta de reducción de latencia frente a nube debe compararse con la misma entrada y medirse; no se debe presentar como resultado anticipado.
+**Archivos:** crear `firmware/esp32_validation/esp32_validation.ino` y `serial_protocol.{h,cpp}`.
 
-**Hito:** tabla de métricas con duración de prueba, criterios de éxito acordados antes de medir y resultado de la prueba de desconexión.
+- [ ] Empezar con `Serial.begin(115200)` y handshake `HELLO,1` → `READY,1`.
+- [ ] Recibir mensajes delimitados por `\n` mediante `Serial.available()`/`read()` y un buffer fijo; validar límite de línea, IDs, valores finitos, orden de índices, cantidad declarada y `END` correspondiente.
+- [ ] Usar `CASE` para asociar una entrada de cada agente. Emitir una respuesta `AGENT` al completar cada inferencia y un solo `RESULT` al terminar el caso; no responder por muestra.
+- [ ] Devolver `ERROR` con causa y conteos ante timeout, truncamiento o datos inválidos. Limpiar el estado incompleto antes de aceptar otro caso.
+- [ ] Medir `preprocess_us`, `inference_us`, `triage_us` y `device_processing_us` con `micros()`, sin incluir impresión serial en los intervalos de cómputo.
+- [ ] Mantener la arena de 80 KiB y probar secuencias repetidas A→B→A y B→A→B. Registrar arena usada y heap libre/mínimo; no dejar dos intérpretes asignados simultáneamente sobre la misma arena.
 
-### 7. Cerrar evidencia
+**Protocolo lógico:** `HELLO`; `CASE`; `BEGIN` con agente, ID y cantidad; muestras `S` con índice; `END` con ID; respuestas `AGENT`, `RESULT` o `ERROR`. Para A, el tamaño del bloque se fija luego de confirmar el límite del filtro; para B son 2.500 muestras.
 
-**Acción:** guardar versión del firmware, modelo exacto y su huella (hash), placa, configuración, conjunto de prueba, reglas y resultados. Incluir fallos y límites observados.
+### Task 5: Probar la tabla de triaje sin modelos
 
-**Advertencia:** los resultados validan el funcionamiento técnico en los escenarios probados; no prueban uso clínico ni desempeño con señales reales, alineadas en el tiempo y tomadas de los mismos pacientes.
+**Archivo:** crear `firmware/esp32_validation/triage.h` y cubrirlo desde `tests/test_esp32_simulation.py` o un harness nativo pequeño.
 
-**Hito:** informe reproducible con datos suficientes para repetir la evaluación y actualizar los resultados del proyecto.
+- [ ] Probar `Fall + ANORMAL → ROJO`.
+- [ ] Probar `Fall + NORMAL → AMARILLO`.
+- [ ] Probar `ADL + ANORMAL → AMARILLO`.
+- [ ] Probar `ADL + NORMAL → VERDE`.
+- [ ] Probar salida ausente, etiqueta desconocida y señal inválida; ninguno debe producir una alerta normal/clínica.
 
-## Referencias consultadas
+### Task 6: Implementar el reproductor de Ubuntu
 
-Consultadas el 8 de octubre de 2026.
+**Archivos:** crear `scripts/esp32_simulation/replay.py`, extender `tests/test_esp32_simulation.py` y declarar pySerial como extra opcional en `pyproject.toml`.
 
-### Documentación oficial de dispositivos y tecnologías
+- [ ] Añadir argumentos `--port`, `--baud` (115200 por defecto), `--dataset-dir`, `--mode` (`fast`/`paced`), `--suite` y `--output`.
+- [ ] Leer los CSV existentes, validar las asociaciones con los manifiestos y enviar las entradas sin concatenar trials.
+- [ ] Configurar timeout de lectura y escritura; tratar una línea incompleta o una respuesta que no llega como fallo de la prueba, no como predicción.
+- [ ] En modo rápido, transmitir en orden a máxima velocidad y esperar una respuesta por bloque.
+- [ ] En modo temporizado, programar envíos a 20 Hz para A y 250 Hz para B usando reloj monotónico; registrar retraso real frente al instante programado.
+- [ ] Medir `end_to_end_ms` desde antes del primer envío del bloque hasta recibir la respuesta completa. No sumar etapas que ya están incluidas en ese tiempo.
+- [ ] Escribir una fila por entrada/caso en `results.csv`, incluyendo IDs, referencias, predicciones, q/scores, tiempos, muestras esperadas/recibidas, modo y estado/error. Guardar versiones, hashes, baud rate y semilla en `run_metadata.json`.
 
-- Google, [LiteRT para microcontroladores: plataformas, flujo y límites](https://developers.google.com/edge/litert/microcontrollers/overview).
-- Espressif, [componente esp-tflite-micro](https://components.espressif.com/components/espressif/esp-tflite-micro): ejemplos para ESP32 y versiones de ESP-IDF indicadas por el componente.
-- Espressif, [I²C para ESP32](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/peripherals/i2c.html).
-- Espressif, [ADC continuo para ESP32](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/peripherals/adc/adc_continuous.html) y [calibración del ADC](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/peripherals/adc/adc_calibration.html).
-- Espressif, [ESP-MQTT para ESP32](https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/protocols/mqtt.html).
-- Eclipse Mosquitto, [documentación del broker MQTT](https://mosquitto.org/documentation/).
-- TDK InvenSense, [ficha técnica MPU-6000/MPU-6050](https://invensense.tdk.com/wp-content/uploads/2015/02/MPU-6000-Datasheet1.pdf) y [mapa de registros](https://invensense.tdk.com/wp-content/uploads/2015/02/MPU-6000-Register-Map1.pdf).
-- Analog Devices, [ficha técnica AD8232](https://www.analog.com/media/en/technical-documentation/data-sheets/ad8232.pdf).
+### Task 7: Ejecutar aceptación y producir el informe
 
-### Documentación del proyecto
+- [ ] Compilar el sketch de validación con ESP32 Core 2.0.17 y `TensorFlowLite_ESP32` 1.0.0.
+- [ ] Probar el handshake y los contadores con `smoke` en modo rápido.
+- [ ] Ejecutar `full` en modo rápido: agentes individuales y los 20 escenarios del manifiesto.
+- [ ] Repetir un subconjunto fijo para la distribución de latencia; después probar modo temporizado y registrar el jitter.
+- [ ] Inyectar línea truncada, muestra omitida, bloque incompleto y desconexión del host; comprobar recuperación y que no aparezcan etiquetas válidas falsas.
+- [ ] Resumir por separado métricas por ventana de A, métricas por registro de B, paridad Python↔ESP32, tabla de triaje, mediana/P95 de tiempos, uso de memoria y errores de comunicación.
+- [ ] Guardar `results.csv`, `run_metadata.json` y `summary.json` en `reports/esp32_validation/<run-id>/`.
 
-- [README del proyecto](../README.md): entradas, frecuencia y ventanas del módulo A.
-- [Entrenamiento del módulo A](04_PIPELINE/entrenamiento.md): escalado, métricas y límites de evaluación por ventana.
-- [Pipeline ECG del módulo B](04_PIPELINE/ecg-ptb-xl-agent1.md): datos, frecuencia y clasificación del modelo.
-- [Plan de Fase 4](00_PLAN/FASE%204%20-%20SISTEMA%20MULTIAGENTE.md): coordinación y tabla de decisiones original.
-- [Plan de Fase 5](00_PLAN/FASE%205%20-%20VALIDACI%C3%93N%20EXPERIMENTAL.md): métricas previstas de latencia, desconexión y falsas alarmas.
+**Verificaciones de software:** `python -m pytest -m "not slow" -v` y el harness nativo de preprocesamiento. **Criterios mínimos:** cero pérdidas silenciosas; todos los IDs esperados registrados; paridad de entrada dentro de la tolerancia acordada; 4/4 reglas correctas; entradas inválidas nunca se clasifican como normales.
+
+## Interpretación y límites
+
+- `fall_window_manifest.csv` produce ventanas solapadas. Las métricas de A son por ventana; no contar ventanas solapadas como eventos independientes.
+- `full` usa UMAFall para caídas y PTB-XL fold 10 para ECG; los 40 ECG seleccionados corresponden a 39 pacientes únicos.
+- Las filas de `scenario_manifest.csv` son emparejamientos artificiales y no sincronizados. La coincidencia de triaje mide la lógica del prototipo, no una mejora clínica ni reducción de falsos positivos en pacientes.
+- `ANORMAL` de PTB-XL no equivale a taquicardia. No presentar el color del triaje como diagnóstico.
+- No calcular falsas alarmas clínicas por hora a partir de los pares sintéticos; requeriría exposición negativa continua y una regla temporal de agrupación de ventanas.
+- No afirmar funcionamiento offline durante pérdida del host USB/Serial: Ubuntu es la fuente de datos de esta prueba.
+
+## Referencias
+
+- [Arduino-ESP32 Serial](https://docs.espressif.com/projects/arduino-esp32/en/latest/api/serial.html): configuración y recepción/transmisión serial.
+- [pySerial API](https://pyserial.readthedocs.io/en/latest/pyserial_api.html) y [lectura de líneas](https://pyserial.readthedocs.io/en/latest/shortintro.html): timeouts, `readline()` y escritura.
+- [Preparación de datasets ESP32](../scripts/esp32_dataset_preparation/README.md): columnas, ventanas y advertencias de los datos generados.
+- [Estado de los modelos INT8](ESTADO_MODELOS_INT8_ESP32.md): contrato de cuantización, estado experimental y gate de producción.
