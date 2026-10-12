@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Resumen auditable de una corrida del reproductor ESP32 (M7/M8).
+"""Resumen auditable de una corrida del reproductor ESP32.
 
 Lee `results.csv` + `run_metadata.json` de un directorio de corrida y calcula:
 - A por trial: matriz de confusion contra etiquetas KFall y contra la
@@ -13,7 +13,7 @@ Lee `results.csv` + `run_metadata.json` de un directorio de corrida y calcula:
 
 Uso:
   .venv/bin/python scripts/esp32_simulation/summarize.py \
-      --run-dir reports/esp32_validation/m7_full \
+      --run-dir reports/esp32_validation/full \
       --dataset-dir notebooks/data/esp32_simulation/rule_based/full
 """
 

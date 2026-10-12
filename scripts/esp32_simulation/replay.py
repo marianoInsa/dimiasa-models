@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reproductor Ubuntu -> ESP32 para M4/M5: handshake, bloques A/B y escenarios CASE.
+"""Reproductor de señales guardadas desde una computadora hacia la ESP32.
 
 Envia un trial KFall (agente A), un registro ECG (agente B) o un escenario
 CASE con las dos entradas, y comprueba AGENT/RESULT/ACK contra la referencia
@@ -17,14 +17,14 @@ Ejemplos:
       --dataset-dir notebooks/data/esp32_simulation/rule_based/smoke --ids S0002 --drop-b
   .venv/bin/python scripts/esp32_simulation/replay.py run --port /dev/ttyUSB0 \
       --dataset-dir notebooks/data/esp32_simulation/rule_based/smoke --mode fast \
-      --output reports/esp32_validation/m6_smoke
+      --output reports/esp32_validation/smoke
   .venv/bin/python scripts/esp32_simulation/replay.py run --port /dev/ttyUSB0 \
       --dataset-dir notebooks/data/esp32_simulation/rule_based/smoke --mode paced \
       --trials KTR0002,KTR0004 --ecgs 14501 --scenarios S0007 --repeat 3 \
-      --output reports/esp32_validation/m8_paced
+      --output reports/esp32_validation/paced
   .venv/bin/python scripts/esp32_simulation/replay.py resilience --port /dev/ttyUSB0 \
       --dataset-dir notebooks/data/esp32_simulation/rule_based/smoke \
-      --output reports/esp32_validation/m8_resilience
+      --output reports/esp32_validation/resilience
 """
 from __future__ import annotations
 
@@ -125,7 +125,7 @@ def load_trial(dataset_dir: Path, trial_id: str) -> tuple[int, str, list[str]]:
 
 
 def rule_reference(dataset_dir: Path, trial_id: str) -> dict:
-    """Reglas congeladas M1 aplicadas al stream del trial (referencia de M4)."""
+    """Aplica las reglas de caída al stream de un ensayo como referencia local."""
     import numpy as np
     import pandas as pd
 
@@ -275,8 +275,8 @@ def check_agent_b(line: str | None, case_id: str, count: int, expected: dict, ex
     class_ok = fields[3] == expected["clase"]
     counters_ok = fields[6] == str(count) and fields[7] == str(expected["saturated"])
     q_delta = q - expected["q"]
-    # Tolerancia M4: redondeo del kernel TFLM en placa frente a TFLite x86 (<=2 LSB
-    # en el smoke). El tensor INT8 debe ser identico (checksum); la clase tambien.
+    # Se toleran hasta dos unidades de diferencia por redondeo, siempre que el
+    # tensor INT8 y la clase coincidan con la referencia local.
     q_ok = q_delta == 0 or (checksum_ok and class_ok and abs(q_delta) <= 2)
     ok = checksum_ok and class_ok and counters_ok and q_ok
     warnings = []
@@ -845,7 +845,7 @@ def run_suite(args: argparse.Namespace) -> int:
             },
             "notes": (
                 "reference_class usa etiquetas de origen; el triaje desde salidas reales se "
-                "reconstruye uniendo trial_A/record_B por fall_trial_id y ecg_id (M7). "
+                "reconstruye uniendo trial_A/record_B por fall_trial_id y ecg_id. "
                 "status distingue ok/partial/error/timeout/missing_agent; un timeout o una "
                 "linea corrupta nunca es prediccion."
             ),

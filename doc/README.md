@@ -1,35 +1,21 @@
-# Wiki del proyecto DiMIASA
+# DiMIASA: modelos para salud y ambiente
 
-Documentación interna del proyecto DiMIASA (CInApTIC / UTN FRRe): plan de trabajo, conceptos médicos y técnicos, fuentes, datasets y pipelines.
+DiMIASA es un proyecto de investigación del Centro de Investigación Aplicada en Tecnologías de la Información y la Comunicación (CInApTIC), de la Universidad Tecnológica Nacional, Facultad Regional Resistencia. Estudia cómo usar sensores y modelos de inteligencia artificial para apoyar el monitoreo de la salud y el ambiente.
 
-## Tablero de avance
+Este repositorio reúne análisis de datos, modelos y una prueba técnica en una placa ESP32. **No es un producto médico y sus resultados no reemplazan una evaluación clínica.**
 
-Leyenda: ✅ Completado · ⏭️ Siguiente · ⏸️ Postergado · 🔄 En curso · ⬜ Pendiente
+## Qué se desarrolló
 
-| Etapa                                                                                   | Estado        | Evidencia                                                                                                                                                                                |
-| --------------------------------------------------------------------------------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| FASE 1 · Módulo A — Caídas (MPU6050)                                                    | ✅ Completado | [00_Preprocesamiento](../notebooks/fase_1/modulo_a_caidas/00_Preprocesamiento.ipynb) + [01_Entrenamiento](../notebooks/fase_1/modulo_a_caidas/01_Entrenamiento.ipynb); resultados en `notebooks/data/modelos/falls/` |
-| FASE 1 · Módulo B — ECG (AD8232)                                                        | ✅ Completado | Pipeline oficial PTB-XL Lead II 250 Hz binario + TinyECGNet Sequential: [00_M1](../../notebooks/fase_1/modulo_b_ecg/00_M1_Creacion_Dataset_PTB-XL_Lead-II_250Hz.ipynb) + [01_M2](../../notebooks/fase_1/modulo_b_ecg/01_M2_Entrenamiento_TinyECGNet_Sequential_PTB-XL.ipynb); resultados en [ecg-ptb-xl-agent1](04_PIPELINE/ecg-ptb-xl-agent1.md) |
-| FASE 1 · Módulo C — SpO2 (MAX30102)                                                     | ✅ C1 completado · ⏸️ C2 bloqueado | C1 ejecutado 18-sep-2026 (commit `5ee0d6b`; pipeline PPG + FC/calidad, sin modelo SpO2): [00_Preprocesamiento-PPG](../notebooks/fase_1/modulo_c_ppg/00_Preprocesamiento-PPG.ipynb) + [preprocesamiento-ppg](04_PIPELINE/preprocesamiento-ppg.md); artefactos en `notebooks/data/plata/ppg/` y `notebooks/data/oro/ppg/set_a.parquet`; estado en [Plan_Implementacion_Módulo_C](00_PLAN/Plan_Implementacion_Módulo_C.md) |
-| [FASE 2 — Conversión LiteRT](00_PLAN/FASE%202%20-%20CONVERSIÓN%20LiteRT.md)             | 🔄 En curso (Módulo A)  | [02_Compresion](../notebooks/fase_2/02_Compresion.ipynb)                                                                                                                                                                                        |
-| [FASE 3 — Sensores físicos](00_PLAN/FASE%203%20-%20SENSORES%20FÍSICOS.md)               | ⬜ Pendiente  | -                                                                                                                                                                                        |
-| [FASE 4 — Sistema multiagente](00_PLAN/FASE%204%20-%20SISTEMA%20MULTIAGENTE.md)         | ⬜ Pendiente  | -                                                                                                                                                                                        |
-| [FASE 5 — Validación experimental](00_PLAN/FASE%205%20-%20VALIDACIÓN%20EXPERIMENTAL.md) | ⬜ Pendiente  | [Plan ESP32+Ubuntu](PLAN_VALIDACION_EXPERIMENTAL_AB_ESP32.md) · [baseline sintético Arduino](../firmware/esp32_int8_baseline/esp32_int8_baseline.ino) · [prototipos experimentales de monitor](../firmware/experiments/monitor-signos-vitales/README.md) |
+- **Detección de caídas:** preparación de cinco conjuntos de datos públicos y entrenamiento de modelos que distinguen caídas de actividades cotidianas.
+- **Electrocardiograma (ECG):** clasificación de señales como normales o anormales y ejecución de un modelo compacto en una ESP32.
+- **Fotopletismografía (PPG):** revisión de calidad de señal y estimación de frecuencia cardíaca. No se entrenó un modelo de oxígeno en sangre porque el conjunto disponible no tiene las señales y mediciones de referencia necesarias.
+- **Prueba integrada:** reproducción de señales guardadas desde una computadora hacia la ESP32 por USB. No se usaron sensores conectados a una persona.
 
-### Resultados actuales (Módulo A)
+## Por dónde empezar
 
-- ETL a 50 Hz con esquema oro de 14 columnas, ventana de 3 s (150 timesteps, 50 % overlap) y CNN-BiLSTM
-- Split sujeto-wise con StratifiedGroupKFold(5)
-- Configuración CPU con subsampleo de 5k/clase.
-- Métricas:
-  - **set_a** (5 datasets, 119 sujetos) Sens 0.9780 ± 0.0109 · Spec 0.9935 ± 0.0023 · Prec 0.9822 ± 0.0064
-  - **set_b** (4 datasets sin UMAFall, 101 sujetos) Sens 0.9806 ± 0.0072 · Spec 0.9916 ± 0.0046 · Prec 0.9764 ± 0.0127.
-    > Nota: falta evaluación cross-dataset
+1. [Cómo preparar y usar el proyecto](uso.md)
+2. [Qué datos y modelos utiliza](metodologia.md)
+3. [Qué se verificó y qué limitaciones tiene](validacion.md)
+4. [Fuentes de investigación](referencias.md)
 
-## Cómo leer esta wiki
-
-- Plan y fases → [PLAN DE TRABAJO](00_PLAN/PLAN%20DE%20TRABAJO.md)
-- Conceptos (medicina, señales, modelos, ambiente) → `01_CONCEPTOS/`
-- Literatura y papers → [Fuentes](02_FUENTES/Fuentes.md)
-- Datasets, experimentos y decisiones de datos → [Estrategia](03_DATASETS/Elegidos/Estrategia.md)
-- Pipeline construido y su fundamentación → `04_PIPELINE/`
+Los detalles exactos de cada análisis están en los notebooks y el firmware que ejecuta cada proceso.
