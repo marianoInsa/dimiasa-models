@@ -267,7 +267,7 @@ Dos candidatos, en orden de probabilidad:
 
 ### Para completar la validación experimental vigente (reglas A + TinyECGNet B)
 
-1. **Integrar el agente de caídas por reglas** de `monitor-signos-vitales/agente2-caida/` en `fall_agent.{h,cpp}` y validarlo con KFall a 100 Hz. Mantener umbrales congelados y declarar que el sensor de KFall está en espalda baja, mientras el código donante indica pecho. No incluir ni ejecutar LiteFallNet.
+1. **Validar con KFall a 100 Hz** el agente de caídas por reglas ya implementado en `firmware/esp32_validation/fall_agent.{h,cpp}`. El sketch donante y sus señales sintéticas se conservan como experimento en `firmware/experiments/monitor-signos-vitales/`; mantener umbrales congelados y declarar que KFall usa un sensor lumbar. No incluir ni ejecutar LiteFallNet.
 
 2. **Mantener Arduino Core 2.0.17 y `TensorFlowLite_ESP32` 1.0.0** para aislar la ruta ECG sobre el baseline ya ejecutado. La migración a ESP-IDF y la aceleración `esp-nn` quedan fuera de esta prueba.
 

@@ -40,6 +40,10 @@ El módulo activo implementa un pipeline de **detección de caídas** a partir d
 │        └── modelos/ecg/tinyecgnet_ptb_xl_250hz     ← Keras, TFLite, firmware y resultados
 │
 ├── doc/                           ← Documentación, diseños y fuentes
+├── firmware/
+│    ├── esp32_validation/         ← Validación vigente: reglas de caída + ECG INT8
+│    ├── esp32_int8_baseline/      ← Baseline sintético histórico
+│    └── experiments/monitor-signos-vitales/ ← Prototipos experimentales archivados
 ├── check-gpu-status.ps1           ← Verificación del entorno para entrenar en GPU
 ├── pyproject.toml
 └── AGENTS.md

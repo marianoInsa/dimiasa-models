@@ -5,7 +5,7 @@ Estado: trabajo del agente completo; **pendiente el gate M2** (revisión del usu
 
 ## A — Máquina de estados `fall_agent.{h,cpp}`
 
-Extraída del sketch donante `monitor-signos-vitales/agente2-caida/Agent2_Fall_ESP32/Agent2_Fall_ESP32.ino` sin el parser Arduino ni las señales del sketch. Umbrales y transiciones idénticos:
+Extraída del sketch donante `firmware/experiments/monitor-signos-vitales/agente2-caida/Agent2_Fall_ESP32/Agent2_Fall_ESP32.ino` sin el parser Arduino ni las señales del sketch. Umbrales y transiciones idénticos:
 
 - Ventanas no solapadas de 100 muestras; impacto `acc_range >= 2.0` y `gyro_range >= 150`; quietud `acc_range < 0.40` y `gyro_range < 30`; 2 ventanas quietas confirman; 3 ventanas post-impacto móviles cancelan.
 - La confirmación se guarda en un pestillo (`fallConfirmed()`) y el estado se reinicia, para que el resultado por trial sobreviva al reset del `CASE`.

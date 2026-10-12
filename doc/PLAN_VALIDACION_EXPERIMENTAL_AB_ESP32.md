@@ -52,7 +52,7 @@ Los headers INT8 oficiales están en el almacenamiento local ignorado bajo `note
 
 ### Task 1: Congelar contratos y validar los datos
 
-**Archivos:** `monitor-signos-vitales/agente2-caida/Agent2_Fall_ESP32/Agent2_Fall_ESP32.ino`, `doc/04_PIPELINE/preprocesamiento.md`, `notebooks/data/bronce/falls/KFall-Reduced.csv`, `scripts/esp32_dataset_preparation/prepare_test_datasets.py` y artefactos/manifiestos ECG.
+**Archivos:** `firmware/experiments/monitor-signos-vitales/agente2-caida/Agent2_Fall_ESP32/Agent2_Fall_ESP32.ino`, `doc/04_PIPELINE/preprocesamiento.md`, `notebooks/data/bronce/falls/KFall-Reduced.csv`, `scripts/esp32_dataset_preparation/prepare_test_datasets.py` y artefactos/manifiestos ECG.
 
 - [ ] Registrar placa exacta, versiones de Arduino IDE/Core/biblioteca, hash del modelo ECG, configuración de build y puerto serial. El baseline LiteFallNet queda como referencia histórica, no se reejecuta.
 - [ ] Confirmar KFall nativo a 100 Hz, canales `Ax…Gz`, unidades `g`/°s, índices, etiquetas y límites por trial. Mantener los datos crudos; no filtrar, remuestrear ni interpolar para A.
