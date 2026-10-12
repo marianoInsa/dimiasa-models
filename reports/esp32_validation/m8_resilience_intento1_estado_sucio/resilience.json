@@ -1,0 +1,70 @@
+{
+  "dataset_dir": "notebooks/data/esp32_simulation/rule_based/smoke",
+  "scenario": "S0007",
+  "started_utc": "2026-10-12T00:05:44Z",
+  "elapsed_s": 42.247,
+  "steps": [
+    {
+      "step": "hello",
+      "ok": true,
+      "observed": [
+        "INFO,heap=194532,arena=81920,model=OK",
+        "READY,1"
+      ]
+    },
+    {
+      "step": "linea_truncada",
+      "injection": "prefijo 'S,5,' sin salto + continuacion: la linea queda con 5 campos",
+      "expected": "ERROR,SAMPLE,KTR0003",
+      "observed": [
+        "ERROR,SAMPLE,KTR0003"
+      ],
+      "ok": true,
+      "recovery_ok": true,
+      "recovery_observed": [
+        "ACK,KTR0003,700",
+        "ACK,5837,2500",
+        "RESULT,S0007,AMARILLO,Fall,NORMAL,7"
+      ]
+    },
+    {
+      "step": "muestra_omitida",
+      "injection": "salto de indice (falta la muestra 5)",
+      "expected": "ERROR,SAMPLE,KTR0003",
+      "observed": [
+        "ERROR,SAMPLE,KTR0003"
+      ],
+      "ok": true,
+      "recovery_ok": false,
+      "recovery_observed": []
+    },
+    {
+      "step": "timeout",
+      "injection": "bloque A incompleto sin mas lineas",
+      "expected": "ERROR,TIMEOUT,KTR0003",
+      "observed": [
+        "ERROR,STATE"
+      ],
+      "ok": false,
+      "recovery_ok": false,
+      "recovery_observed": []
+    },
+    {
+      "step": "host_desconectado",
+      "injection": "cierre del puerto con el bloque A a medias; reconexion tras 7 s",
+      "expected": "HELLO/READY tras reconectar y caso valido sin estado residual",
+      "observed": [
+        "INFO,heap=194532,arena=81920,model=OK",
+        "READY,1"
+      ],
+      "ok": true,
+      "recovery_ok": true,
+      "recovery_observed": [
+        "ACK,KTR0003,700",
+        "ACK,5837,2500",
+        "RESULT,S0007,AMARILLO,Fall,NORMAL,7"
+      ]
+    }
+  ],
+  "all_ok": false
+}

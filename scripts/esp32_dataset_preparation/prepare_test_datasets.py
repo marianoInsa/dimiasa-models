@@ -1,28 +1,34 @@
 #!/usr/bin/env python3
-"""Create small, reproducible, sensor-like replay datasets for ESP32 fall/ECG models.
+"""Create replay datasets for the ESP32 rule-based fall agent (A) and TinyECGNet (B).
 
 Inputs
 ------
-- UMAFall-Reduced.csv with Subject, Activity_Label, Activity_Code, Trial,
-  Sample_Index, Ax, Ay, Az, Gx, Gy, Gz.
+- KFall-Reduced.csv with Subject, Activity_Label, Activity_Code, Trial,
+  Sample_Index, Ax, Ay, Az, Gx, Gy, Gz at the dataset's native 100 Hz,
+  in g and degrees/s.
 - HDF5 with X (N, 2500), y, ecg_id, patient_id and strat_fold datasets.
 
 Outputs (under --out)
-----------------------
-- fall_stream.csv: selected full trials, original six axes, sensor-like samples at 20 Hz.
-- fall_window_manifest.csv: sliding 60-sample windows, hop 30, and reference labels.
+---------------------
+- fall_stream.csv: whole KFall trials, original six axes at 100 Hz, trimmed to a
+  whole number of 100-sample windows. Replay one trial at a time; never join
+  trial boundaries.
+- fall_trial_manifest.csv: one row per trial with source/sent sample counts.
 - ecg_records.csv: metadata for selected complete ECG records.
-- ecg_stream.csv: samples of each selected record at 250 Hz, original value plus
+- ecg_stream.csv: 2,500 Lead-II samples per record at 250 Hz, original value plus
   an optional simulated 12-bit ADC count using one global affine scale.
-- scenario_manifest.csv: synthetic combinations covering the four triage rules.
-- summary.json: counts, assumptions and warnings.
+- scenario_manifest.csv: synthetic fall-trial/ECG pairings covering the four
+  triage table cells, referencing fall_trial_id (not windows).
+- summary.json: counts, source hashes, assumptions and warnings.
 
-This script does NOT filter/resample/quantize model inputs. Do that in the firmware,
-using exactly the same preprocessing as the trained model. Requires numpy, pandas, h5py.
+This script does NOT filter, resample or quantize model inputs. Do that in the
+firmware, using exactly the same preprocessing as the trained model. Requires
+numpy, pandas, h5py.
 """
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 from typing import Any
@@ -32,22 +38,27 @@ import numpy as np
 import pandas as pd
 
 FALL_COLUMNS = ["Ax", "Ay", "Az", "Gx", "Gy", "Gz"]
-FALL_WINDOW = 60       # 3 s * 20 Hz
-FALL_HOP = 30          # 1.5 s * 20 Hz
-FALL_POS_RADIUS = 30   # center within +/- 1.5 s of AVM peak at 20 Hz
-ECG_WINDOW = 2500      # 10 s * 250 Hz
+FALL_RATE_HZ = 100
+FALL_WINDOW_SAMPLES = 100
+ECG_WINDOW = 2500
+TRIAGE_BY_CELL = {
+    ("Fall", "ANORMAL"): "ROJO",
+    ("Fall", "NORMAL"): "AMARILLO",
+    ("ADL", "ANORMAL"): "AMARILLO",
+    ("ADL", "NORMAL"): "VERDE",
+}
 
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--fall-csv", required=True, type=Path, help="Path to UMAFall-Reduced.csv")
+    p.add_argument("--fall-csv", required=True, type=Path, help="Path to KFall-Reduced.csv")
     p.add_argument("--ecg-h5", required=True, type=Path, help="Path to the HDF5 ECG dataset")
     p.add_argument("--out", required=True, type=Path, help="Output directory")
     p.add_argument("--fall-trials-per-class", type=int, default=10,
                    help="Number of Fall and ADL trials to select (default: 10 each)")
     p.add_argument("--ecg-records-per-class", type=int, default=20,
                    help="Number of ECG records per class from fold 10 (default: 20 each)")
-    p.add_argument("--scenario-repetitions", type=int, default=5,
+    p.add_argument("--scenarios-per-cell", type=int, default=5,
                    help="Synthetic pairings per each of the four decision-table cells (default: 5)")
     p.add_argument("--seed", type=int, default=20261010, help="Random seed")
     p.add_argument("--h5-x-key", default="X")
@@ -89,7 +100,7 @@ def balanced_trial_selection(
 ) -> list[tuple[tuple[Any, ...], pd.DataFrame, str]]:
     candidates: dict[str, list[tuple[tuple[Any, ...], pd.DataFrame]]] = {"Fall": [], "ADL": []}
     for key, frame in groups:
-        if len(frame) < FALL_WINDOW:
+        if len(frame) < FALL_WINDOW_SAMPLES:
             continue
         cls = class_from_activity(frame["Activity_Label"].iloc[0])
         candidates[cls].append((key, frame))
@@ -99,7 +110,7 @@ def balanced_trial_selection(
         pool = candidates[cls]
         if len(pool) < n_per_class:
             raise ValueError(
-                f"Hay solo {len(pool)} trials {cls} con al menos {FALL_WINDOW} muestras; "
+                f"Hay solo {len(pool)} trials {cls} con al menos {FALL_WINDOW_SAMPLES} muestras; "
                 f"se solicitaron {n_per_class}. Reducí --fall-trials-per-class."
             )
         perm = rng.permutation(len(pool))
@@ -133,73 +144,70 @@ def prepare_fall(args: argparse.Namespace, rng: np.random.Generator) -> tuple[pd
     selected = balanced_trial_selection(grouped, args.fall_trials_per_class, rng)
 
     stream_rows: list[pd.DataFrame] = []
-    window_rows: list[dict[str, Any]] = []
+    manifest_rows: list[dict[str, Any]] = []
     trial_counts = {"Fall": 0, "ADL": 0}
     for seq, (key, trial, trial_cls) in enumerate(selected, start=1):
-        trial_id = f"FTR{seq:04d}"
+        trial_id = f"KTR{seq:04d}"
         trial_counts[trial_cls] += 1
         values = trial[FALL_COLUMNS].apply(pd.to_numeric, errors="coerce")
         if values.isna().any().any():
             raise ValueError(f"Valores no numéricos/ausentes en trial {key}; limpiá el CSV antes de continuar.")
         arr = values.to_numpy(dtype=np.float32)
-        # Peak proxy for the training-window target rule: magnitude of the three acceleration axes.
-        avm = np.sqrt(np.sum(arr[:, :3] ** 2, axis=1))
-        peak_pos = int(np.argmax(avm)) if trial_cls == "Fall" else -1
+        if not np.isfinite(arr).all():
+            raise ValueError(f"Valores no finitos en trial {key}; limpiá el CSV antes de continuar.")
 
-        src = trial.copy()
+        source_samples = int(len(trial))
+        stream_samples = (source_samples // FALL_WINDOW_SAMPLES) * FALL_WINDOW_SAMPLES
+        if stream_samples < FALL_WINDOW_SAMPLES:
+            raise ValueError(f"El trial {key} no alcanza una ventana completa de {FALL_WINDOW_SAMPLES} muestras.")
+
+        # Se envían solo ventanas completas de 100 muestras; el resto queda
+        # registrado en el manifiesto. Un bloque truncado por el transporte no
+        # puede producir ADL (ver contrato del firmware).
+        trimmed = trial.iloc[:stream_samples]
+        src = trimmed.copy()
         src.insert(0, "trial_id", trial_id)
         src.insert(1, "trial_label", trial_cls)
-        src["stream_sample"] = np.arange(len(src), dtype=np.int32)
+        src["stream_sample"] = np.arange(stream_samples, dtype=np.int32)
         src = src[["trial_id", "Subject", "Activity_Label", "Activity_Code", "Trial",
                    "trial_label", "stream_sample", "Sample_Index", *FALL_COLUMNS]]
         stream_rows.append(src)
 
-        start = 0
-        while start + FALL_WINDOW <= len(trial):
-            center = start + FALL_WINDOW // 2
-            if trial_cls == "Fall":
-                distance = abs(center - peak_pos)
-                model_target = "Fall" if distance <= FALL_POS_RADIUS else "ADL"
-            else:
-                distance = None
-                model_target = "ADL"
-            window_rows.append({
-                "window_id": f"{trial_id}_W{start:05d}",
-                "trial_id": trial_id,
-                "subject": decode_scalar(trial["Subject"].iloc[0]),
-                "trial_label": trial_cls,
-                "model_target_reference": model_target,
-                "source_start_sample": int(trial["Sample_Index"].iloc[start]),
-                "source_center_sample": int(trial["Sample_Index"].iloc[center]),
-                "start_stream_sample": start,
-                "center_stream_sample": center,
-                "peak_stream_sample": peak_pos if peak_pos >= 0 else None,
-                "center_to_peak_distance_samples": distance,
-                "window_samples_20hz": FALL_WINDOW,
-                "hop_samples_20hz": FALL_HOP,
-            })
-            start += FALL_HOP
+        manifest_rows.append({
+            "trial_id": trial_id,
+            "subject": decode_scalar(trial["Subject"].iloc[0]),
+            "activity_code": decode_scalar(trial["Activity_Code"].iloc[0]),
+            "activity_label": decode_scalar(trial["Activity_Label"].iloc[0]),
+            "trial_number": int(trial["Trial"].iloc[0]),
+            "trial_label": trial_cls,
+            "source_samples": source_samples,
+            "stream_samples": stream_samples,
+            "trim_remainder": source_samples - stream_samples,
+            "windows": stream_samples // FALL_WINDOW_SAMPLES,
+            "rate_hz": FALL_RATE_HZ,
+        })
 
     stream = pd.concat(stream_rows, ignore_index=True)
-    windows = pd.DataFrame(window_rows)
-    if not (windows["model_target_reference"] == "Fall").any():
-        raise ValueError("No se generaron ventanas positivas Fall; revisá duración y etiquetas de los trials seleccionados.")
-    return stream, windows, {
+    trials = pd.DataFrame(manifest_rows)
+    return stream, trials, {
         "source_rows": int(len(df)),
         "selected_trials": int(len(selected)),
         "selected_trials_by_label": trial_counts,
         "stream_samples": int(len(stream)),
-        "reference_windows": int(len(windows)),
-        "reference_windows_by_model_target": {
-            str(k): int(v) for k, v in windows["model_target_reference"].value_counts().to_dict().items()
-        },
-        "input_rate_hz": 20,
-        "window_samples": FALL_WINDOW,
-        "window_seconds": 3.0,
-        "hop_samples": FALL_HOP,
-        "hop_seconds": 1.5,
-        "positive_rule": "Fall trial and window center within +/- 30 original samples (1.5 s) of the AVM-magnitude peak; all ADL-trial windows are ADL.",
-        "warning": "AVM peak from raw axes is a proxy. Confirm it matches the exact peak/label-generation code used to train LiteFallNet. Trial label and per-window training target can differ."
+        "windows": int(len(stream) // FALL_WINDOW_SAMPLES),
+        "input_rate_hz": FALL_RATE_HZ,
+        "window_samples": FALL_WINDOW_SAMPLES,
+        "window_seconds": 1.0,
+        "trim_policy": (
+            "each trial keeps floor(samples/100)*100 samples so every delivered window is complete; "
+            "trim_remainder is recorded per trial and no sample is resampled or filtered"
+        ),
+        "warning": (
+            "Declared prototype mount is the waist (pelvic/lumbar zone), consistent with KFall's "
+            "lower-back IMU; the donor sketch's chest comment does not apply to this run. "
+            "KFall-Reduced has no impact-time anchor, so A is evaluated per trial and no event "
+            "latency is reported."
+        ),
     }
 
 
@@ -307,37 +315,30 @@ def prepare_ecg(args: argparse.Namespace, rng: np.random.Generator) -> tuple[pd.
     }
 
 
-def make_scenario_manifest(windows: pd.DataFrame, records: pd.DataFrame,
-                           repetitions: int, rng: np.random.Generator) -> pd.DataFrame:
-    fall_pos = windows[windows["model_target_reference"] == "Fall"]
-    fall_neg = windows[windows["model_target_reference"] == "ADL"]
-    ecg_norm = records[records["label_name"] == "NORMAL"]
-    ecg_abn = records[records["label_name"] == "ANORMAL"]
-    if min(len(fall_pos), len(fall_neg), len(ecg_norm), len(ecg_abn)) == 0:
-        raise ValueError("No hay ejemplos para una o más clases; no se puede crear scenario_manifest.csv.")
+def make_scenario_manifest(trials: pd.DataFrame, records: pd.DataFrame,
+                           per_cell: int, rng: np.random.Generator) -> pd.DataFrame:
+    by_trial_label = {cls: trials[trials["trial_label"] == cls] for cls in ("Fall", "ADL")}
+    by_ecg_label = {cls: records[records["label_name"] == cls] for cls in ("NORMAL", "ANORMAL")}
+    for cls, group in {**{f"trial {k}": v for k, v in by_trial_label.items()},
+                       **{f"ecg {k}": v for k, v in by_ecg_label.items()}}.items():
+        if group.empty:
+            raise ValueError(f"No hay ejemplos para {cls}; no se puede crear scenario_manifest.csv.")
 
-    specs = [
-        ("Fall", "ANORMAL", "ROJO"),
-        ("Fall", "NORMAL", "AMARILLO"),
-        ("ADL", "ANORMAL", "AMARILLO"),
-        ("ADL", "NORMAL", "VERDE"),
-    ]
-    fall_groups = {"Fall": fall_pos, "ADL": fall_neg}
-    ecg_groups = {"NORMAL": ecg_norm, "ANORMAL": ecg_abn}
     out: list[dict[str, Any]] = []
     seq = 1
-    for fall_cls, ecg_cls, triage in specs:
-        fg = fall_groups[fall_cls]
-        eg = ecg_groups[ecg_cls]
-        for _ in range(repetitions):
-            fw = fg.iloc[int(rng.integers(0, len(fg)))]
-            er = eg.iloc[int(rng.integers(0, len(eg)))]
+    for (fall_cls, ecg_cls), triage in TRIAGE_BY_CELL.items():
+        t_group = by_trial_label[fall_cls].reset_index(drop=True)
+        e_group = by_ecg_label[ecg_cls].reset_index(drop=True)
+        t_perm = rng.permutation(len(t_group))
+        e_perm = rng.permutation(len(e_group))
+        for i in range(per_cell):
+            trial = t_group.iloc[int(t_perm[i % len(t_group)])]
+            record = e_group.iloc[int(e_perm[i % len(e_group)])]
             out.append({
                 "scenario_id": f"S{seq:04d}",
-                "fall_window_id": fw["window_id"],
-                "fall_trial_id": fw["trial_id"],
+                "fall_trial_id": trial["trial_id"],
                 "fall_reference_label": fall_cls,
-                "ecg_id": er["ecg_id"],
+                "ecg_id": record["ecg_id"],
                 "ecg_reference_label": ecg_cls,
                 "expected_triage_from_reference_labels": triage,
                 "pairing_type": "SYNTHETIC_UNSYNCHRONIZED",
@@ -346,19 +347,100 @@ def make_scenario_manifest(windows: pd.DataFrame, records: pd.DataFrame,
     return pd.DataFrame(out)
 
 
+def validate_dataset(stream: pd.DataFrame, trials: pd.DataFrame, records: pd.DataFrame,
+                     ecg_stream: pd.DataFrame, scenarios: pd.DataFrame, per_cell: int) -> None:
+    errors: list[str] = []
+
+    if trials["trial_id"].duplicated().any():
+        errors.append("trial_id duplicado en fall_trial_manifest.csv")
+    if not set(trials["trial_label"]).issubset({"Fall", "ADL"}):
+        errors.append("trial_label fuera de {Fall, ADL}")
+    for trial_id, frame in stream.groupby("trial_id", sort=False):
+        row = trials.loc[trials["trial_id"] == trial_id].iloc[0]
+        expected = int(row["stream_samples"])
+        if len(frame) != expected:
+            errors.append(f"{trial_id}: stream_samples={len(frame)} != manifiesto={expected}")
+        if not np.array_equal(frame["stream_sample"].to_numpy(), np.arange(expected)):
+            errors.append(f"{trial_id}: stream_sample no es consecutivo 0..N-1")
+        if not np.array_equal(frame["Sample_Index"].to_numpy(), np.arange(1, expected + 1)):
+            errors.append(f"{trial_id}: Sample_Index no es consecutivo 1..N")
+        if expected != int(row["windows"]) * FALL_WINDOW_SAMPLES:
+            errors.append(f"{trial_id}: stream_samples no es múltiplo de {FALL_WINDOW_SAMPLES}")
+    if set(stream["trial_id"]) != set(trials["trial_id"]):
+        errors.append("trial_id del stream y del manifiesto no coinciden")
+    if not np.isfinite(stream[FALL_COLUMNS].to_numpy(dtype=np.float64)).all():
+        errors.append("valores no finitos en fall_stream.csv")
+
+    if records["ecg_id"].duplicated().any():
+        errors.append("ecg_id duplicado en ecg_records.csv")
+    if not set(records["label_name"]).issubset({"NORMAL", "ANORMAL"}):
+        errors.append("label_name fuera de {NORMAL, ANORMAL}")
+    for ecg_id, frame in ecg_stream.groupby("ecg_id", sort=False):
+        if len(frame) != ECG_WINDOW:
+            errors.append(f"ecg_id {ecg_id}: {len(frame)} muestras != {ECG_WINDOW}")
+        if not np.array_equal(frame["sample_index"].to_numpy(), np.arange(ECG_WINDOW)):
+            errors.append(f"ecg_id {ecg_id}: sample_index no es consecutivo 0..N-1")
+    merged_finite = np.isfinite(ecg_stream["lead_ii_value_original"].to_numpy(dtype=np.float64))
+    if not merged_finite.all():
+        errors.append("valores no finitos en ecg_stream.csv")
+    if "adc_count_sim" in ecg_stream.columns:
+        adc = ecg_stream["adc_count_sim"].to_numpy()
+        if adc.min() < 0 or adc.max() > 4095:
+            errors.append("adc_count_sim fuera de [0, 4095]")
+
+    if scenarios["scenario_id"].duplicated().any():
+        errors.append("scenario_id duplicado en scenario_manifest.csv")
+    merged = scenarios.merge(
+        trials[["trial_id", "trial_label"]], left_on="fall_trial_id", right_on="trial_id",
+        how="left", validate="many_to_one")
+    if merged["trial_id"].isna().any():
+        errors.append("scenario_manifest.csv referencia fall_trial_id huérfanos")
+    if (merged["fall_reference_label"] != merged["trial_label"]).any():
+        errors.append("fall_reference_label no coincide con el trial referenciado")
+    merged = scenarios.merge(
+        records[["ecg_id", "label_name"]], on="ecg_id", how="left", validate="many_to_one")
+    if merged["label_name"].isna().any():
+        errors.append("scenario_manifest.csv referencia ecg_id huérfanos")
+    if (merged["ecg_reference_label"] != merged["label_name"]).any():
+        errors.append("ecg_reference_label no coincide con el registro referenciado")
+    expected_triage = [
+        TRIAGE_BY_CELL[(f, e)]
+        for f, e in zip(scenarios["fall_reference_label"], scenarios["ecg_reference_label"])
+    ]
+    if (scenarios["expected_triage_from_reference_labels"].to_numpy() != np.asarray(expected_triage)).any():
+        errors.append("expected_triage_from_reference_labels no coincide con la tabla congelada")
+    cell_counts = scenarios.groupby(
+        ["fall_reference_label", "ecg_reference_label"]).size().to_dict()
+    if len(cell_counts) != 4 or any(v != per_cell for v in cell_counts.values()):
+        errors.append(f"recuento por celda != {per_cell}: {cell_counts}")
+
+    if errors:
+        raise ValueError("Validación de integridad falló:\n- " + "\n- ".join(errors))
+
+
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as fh:
+        for chunk in iter(lambda: fh.read(1 << 20), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
 def main() -> None:
     args = parse_args()
-    if args.fall_trials_per_class < 1 or args.ecg_records_per_class < 1 or args.scenario_repetitions < 1:
+    if args.fall_trials_per_class < 1 or args.ecg_records_per_class < 1 or args.scenarios_per_cell < 1:
         raise ValueError("Los tamaños y repeticiones deben ser >= 1.")
     args.out.mkdir(parents=True, exist_ok=True)
     rng = np.random.default_rng(args.seed)
 
-    fall_stream, fall_windows, fall_summary = prepare_fall(args, rng)
+    fall_stream, fall_trials, fall_summary = prepare_fall(args, rng)
     ecg_records, ecg_stream, ecg_summary = prepare_ecg(args, rng)
-    scenarios = make_scenario_manifest(fall_windows, ecg_records, args.scenario_repetitions, rng)
+    scenarios = make_scenario_manifest(fall_trials, ecg_records, args.scenarios_per_cell, rng)
+
+    validate_dataset(fall_stream, fall_trials, ecg_records, ecg_stream, scenarios, args.scenarios_per_cell)
 
     fall_stream.to_csv(args.out / "fall_stream.csv", index=False)
-    fall_windows.to_csv(args.out / "fall_window_manifest.csv", index=False)
+    fall_trials.to_csv(args.out / "fall_trial_manifest.csv", index=False)
     ecg_records.to_csv(args.out / "ecg_records.csv", index=False)
     ecg_stream.to_csv(args.out / "ecg_stream.csv", index=False)
     scenarios.to_csv(args.out / "scenario_manifest.csv", index=False)
@@ -366,18 +448,24 @@ def main() -> None:
     summary = {
         "seed": args.seed,
         "files": {
-            "fall_stream.csv": "Raw six-axis trial samples in source order, 20 Hz; replay one trial at a time, do not join trial boundaries.",
-            "fall_window_manifest.csv": "Reference labels for 60-sample/3-second fall windows, hop 30 samples.",
+            "fall_stream.csv": "Whole KFall trials, six axes at native 100 Hz, trimmed to 100-sample windows; replay one trial at a time and never join trial boundaries.",
+            "fall_trial_manifest.csv": "One row per selected trial: source/sent samples, windows, trim remainder.",
             "ecg_records.csv": "Selected ECG record metadata, labels, and fold.",
             "ecg_stream.csv": "2,500 Lead-II samples per record at 250 Hz, unfiltered; includes a simulated ADC count unless disabled.",
-            "scenario_manifest.csv": "Test combinations for the decision table; pairs are synthetic, not synchronized clinical events."
+            "scenario_manifest.csv": "Test combinations for the decision table referencing fall_trial_id; pairs are synthetic, not synchronized clinical events."
+        },
+        "sources": {
+            "fall_csv": str(args.fall_csv),
+            "fall_csv_sha256": sha256_file(args.fall_csv),
+            "ecg_h5": str(args.ecg_h5),
+            "ecg_h5_sha256": sha256_file(args.ecg_h5),
         },
         "fall": fall_summary,
         "ecg": ecg_summary,
         "scenarios": {
             "rows": int(len(scenarios)),
             "by_expected_triage": {str(k): int(v) for k, v in scenarios["expected_triage_from_reference_labels"].value_counts().to_dict().items()},
-            "interpretation": "Integration/table tests only: UMAFall and PTB-XL are unrelated recordings with no shared patient/time axis. Do not use these pairs to claim clinical fusion accuracy or reduced real-world false positives."
+            "interpretation": "Integration/table tests only: KFall and PTB-XL are unrelated recordings with no shared patient/time axis. Do not use these pairs to claim clinical fusion accuracy or reduced real-world false positives."
         }
     }
     (args.out / "summary.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")

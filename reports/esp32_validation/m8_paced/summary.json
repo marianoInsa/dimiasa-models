@@ -1,0 +1,161 @@
+{
+  "run_dir": "reports/esp32_validation/m8_paced",
+  "dataset_dir": "notebooks/data/esp32_simulation/rule_based/smoke",
+  "suite": "smoke",
+  "mode": "paced",
+  "rows": 12,
+  "statuses": {
+    "ok": 12
+  },
+  "agent_a": {
+    "vs_labels": {
+      "matrix": {
+        "Fall": {
+          "Fall": 3
+        },
+        "ADL": {
+          "ADL": 3
+        }
+      },
+      "indeterminados": 0,
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "tn": 3,
+      "sensitivity": 1.0,
+      "specificity": 1.0,
+      "precision": 1.0,
+      "f1": 1.0
+    },
+    "vs_rules_reference": {
+      "matches": 6,
+      "total": 6,
+      "mismatches": []
+    }
+  },
+  "agent_b": {
+    "vs_labels": {
+      "matrix": {
+        "ANORMAL": {
+          "NORMAL": 3
+        }
+      },
+      "tp": 0,
+      "fp": 0,
+      "fn": 3,
+      "tn": 0,
+      "sensitivity": 0.0,
+      "specificity": null,
+      "precision": null,
+      "f1": null
+    },
+    "vs_host_reference": {
+      "checksum_matches": 3,
+      "q_exact": 0,
+      "q_within_2": 3,
+      "total": 3,
+      "max_abs_delta": 2
+    }
+  },
+  "triage": {
+    "generated_vs_labels": {
+      "matrix": {
+        "AMARILLO": {
+          "AMARILLO": 3
+        }
+      },
+      "matches": 3,
+      "total": 3
+    },
+    "generated_vs_outputs": {
+      "matrix": {},
+      "matches": 0,
+      "total": 0,
+      "not_evaluable": 3,
+      "mismatches": []
+    }
+  },
+  "errors": {
+    "transport": 0,
+    "a_vs_rules_mismatches": 0,
+    "b_checksum_mismatches": 0,
+    "triage_logic_mismatches": 0
+  },
+  "timings_us": {
+    "fall_us": {
+      "n": 6,
+      "median": 1245.0,
+      "p95": 1334.75,
+      "max": 1335.0
+    },
+    "preproc_us": {
+      "n": 3,
+      "median": 108091.0,
+      "p95": 108127.0,
+      "max": 108131.0
+    },
+    "infer_us": {
+      "n": 3,
+      "median": 1112917.0,
+      "p95": 1113095.2,
+      "max": 1113115.0
+    },
+    "triage_us": {
+      "n": 3,
+      "median": 5.0,
+      "p95": 6.8,
+      "max": 7.0
+    }
+  },
+  "e2e_ms": {
+    "trial_A": {
+      "n": 6,
+      "median": 6509.0675,
+      "p95": 7007.65925,
+      "max": 7007.793
+    },
+    "record_B": {
+      "n": 3,
+      "median": 11247.416,
+      "p95": 11251.1546,
+      "max": 11251.57
+    },
+    "scenario": {
+      "n": 3,
+      "median": 18259.994,
+      "p95": 18260.8427,
+      "max": 18260.937
+    }
+  },
+  "memory": {
+    "heap_initial": 194532,
+    "heap_min": 194268,
+    "heap_max": 194532,
+    "heap_last": 194268
+  },
+  "scheduling": {
+    "record_B": {
+      "cases": 3,
+      "late_median_ms_median": 0.105,
+      "late_p95_ms_max": 1.785,
+      "late_max_ms_max": 5.803
+    },
+    "scenario": {
+      "cases": 3,
+      "late_median_ms_median": 0.104,
+      "late_p95_ms_max": 0.561,
+      "late_max_ms_max": 5.698
+    },
+    "trial_A": {
+      "cases": 6,
+      "late_median_ms_median": 0.1055,
+      "late_p95_ms_max": 0.58,
+      "late_max_ms_max": 3.529
+    }
+  },
+  "repeats": {
+    "1": 4,
+    "2": 4,
+    "3": 4
+  }
+}

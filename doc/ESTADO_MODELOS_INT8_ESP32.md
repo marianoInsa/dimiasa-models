@@ -1,21 +1,21 @@
-# Estado de los modelos INT8 para ESP32 — módulos A (caídas) y B (ECG)
+# Estado de artefactos INT8 para ESP32 — LiteFallNet y TinyECGNet
 
-**Fecha:** 2026-10-10
+**Fecha:** 2026-10-11
 **Repo:** `/home/insa/Code/dimiasa-models`
-**Objetivo:** evaluar experimentalmente los modelos A y B en un ESP32 clásico con Arduino y TensorFlow Lite Micro.
+**Objetivo:** documentar los artefactos INT8 LiteFallNet y TinyECGNet y su baseline sintético. La validación experimental vigente de Fase 5 selecciona un agente de caídas por reglas y TinyECGNet; LiteFallNet no forma parte de esa corrida.
 
 ---
 
 ## 1. Resumen ejecutivo
 
-| Módulo | Modelo | Tamaño | Estado |
+| Artefacto | Modelo | Tamaño | Estado |
 |---|---|---:|---|
 | **B** — ECG (AD8232) | `agent1_tinyecgnet_sequential_int8.tflite` | 18.584 B (18,1 KiB) | ✅ Exportado a C, verificado. Baseline sintético ejecutado en ESP32. |
-| **A** — caídas (MPU6050) | `litefallnet_sisfall_int8.tflite` | 45.256 B (44,2 KiB) | 🧪 Apto para esta evaluación experimental externa. El gate de producción en UPFall sigue sin aprobarse. |
+| LiteFallNet — caídas (MPU6050) | `litefallnet_sisfall_int8.tflite` | 45.256 B (44,2 KiB) | Artefacto INT8 verificado; no seleccionado para la validación Fase 5 vigente. El gate de producción en UPFall sigue sin aprobarse. |
 
-El pipeline de conversión y empaquetado está **terminado y verificado para ambos módulos**. Hay un sketch Arduino de baseline sintético; falta el firmware de reproducción serial, el preprocesamiento de señales reales y la prueba con los datasets.
+El pipeline de conversión y empaquetado está **terminado y verificado para ambos artefactos INT8**. El baseline sintético ya se ejecutó con ambos. Para la validación Fase 5 vigente falta integrar el agente de caídas basado en reglas, el firmware serial, el preprocesamiento ECG y la prueba con los datasets.
 
-**Alcance del modelo A:** puede ejecutarse en la placa para la validación experimental solicitada. El resultado externo de UPFall documentado en la sección 4 mantiene pendiente el gate de producción; no bloquea esta prueba ni autoriza una afirmación clínica.
+**LiteFallNet:** su resultado externo de UPFall documentado en la sección 4 mantiene pendiente el gate de producción. No se ejecutará como módulo A en el plan de validación actualizado; su estado aquí es referencia del artefacto y del baseline histórico, no autorización de uso clínico.
 
 ### Baseline sintético en Arduino
 
@@ -96,7 +96,7 @@ Decisión:  ANORMAL si q_salida >= 0   (equivalente a p >= 0,5)
 
 ---
 
-## 3. Módulo A — caídas (baseline experimental ejecutado; gate de producción pendiente)
+## 3. LiteFallNet — artefacto INT8 de caídas (baseline sintético ejecutado; gate de producción pendiente)
 
 ### Artefactos
 
@@ -172,7 +172,7 @@ Etiquetado: `0` = ADL, `1` = caída. Positiva si el centro de la ventana está a
 
 ---
 
-## 4. Gate de producción del modelo A (no bloquea esta validación experimental)
+## 4. Gate de producción de LiteFallNet (independiente de la validación Fase 5)
 
 ### Gate actual
 
@@ -187,7 +187,7 @@ La cuantización INT8 no puede perder más de **2 puntos porcentuales** frente a
 | **UPFall externo** | **precisión** | **0,7458** | **0,5066** | **−0,239** | ❌ |
 | UPFall externo | recall | 0,8237 | 0,8933 | +0,070 | ✅ |
 
-`estado_candidato: no_listo_para_despliegue` describe el gate de producción. Para esta evaluación experimental se acepta ejecutar el modelo en la placa y medirlo sobre los datos seleccionados.
+`estado_candidato: no_listo_para_despliegue` describe el gate de producción de LiteFallNet. El plan Fase 5 actualizado no selecciona este modelo para la corrida experimental.
 
 En UPFall **1 de cada 2 detecciones es falsa alarma**. Además el recall sube: el modelo grita "caída" ante casi todo.
 
@@ -230,7 +230,7 @@ Dos candidatos, en orden de probabilidad:
 
 ## 5. Cambios aplicados en esta sesión
 
-### Notebook 04 (conversión del módulo A)
+### Notebook 04 (conversión de LiteFallNet)
 
 | Cambio | Estado |
 |---|---|
@@ -261,21 +261,23 @@ Dos candidatos, en orden de probabilidad:
 
 ## 6. Pendiente
 
-### Pendiente para producción (no bloquea la prueba experimental)
+### Pendiente para producción de LiteFallNet
 
-1. **Decidir el camino de cuantización del módulo A.** El PTQ no supera el gate externo actual. QAT queda como trabajo futuro de producción; no cambiar ni reentrenar el modelo durante esta evaluación.
+1. **Decidir el camino de cuantización de LiteFallNet.** El PTQ no supera el gate externo actual. QAT queda como trabajo futuro de producción; esta decisión es independiente de la validación por reglas.
 
-### Para completar la validación experimental
+### Para completar la validación experimental vigente (reglas A + TinyECGNet B)
 
-2. **Mantener Arduino Core 2.0.17 y `TensorFlowLite_ESP32` 1.0.0** para aislar la validación sobre el baseline ya ejecutado. La migración a ESP-IDF y la aceleración `esp-nn` quedan fuera de esta prueba.
+1. **Integrar el agente de caídas por reglas** de `monitor-signos-vitales/agente2-caida/` en `fall_agent.{h,cpp}` y validarlo con KFall a 100 Hz. Mantener umbrales congelados y declarar que el sensor de KFall está en espalda baja, mientras el código donante indica pecho. No incluir ni ejecutar LiteFallNet.
+
+2. **Mantener Arduino Core 2.0.17 y `TensorFlowLite_ESP32` 1.0.0** para aislar la ruta ECG sobre el baseline ya ejecutado. La migración a ESP-IDF y la aceleración `esp-nn` quedan fuera de esta prueba.
 
 3. **Exportar los coeficientes de filtro del ECG a C.** No están en ningún header. Deben incluir las condiciones iniciales de estado estacionario de `sosfiltfilt`/`filtfilt`: implementar el filtro con IC en cero introduce un error RMS de **0,067** sobre un ECG real, que destruye la señal de forma silenciosa.
 
-4. **Validar el preprocesamiento en C contra scipy antes de flashear**, con un harness nativo en la PC. Criterio: `max|Δ| < 1e-6`.
+4. **Validar el preprocesamiento ECG en C contra scipy antes de flashear**, con un harness nativo en la PC. Criterio: `max|Δ| < 1e-6`; validar A con los vectores de estado definidos en el plan.
 
 5. **No se requiere cablear el AD8232 para la reproducción de datasets.** El host enviará `adc_count_sim`; la validación con sensores físicos corresponde a una fase posterior.
 
-6. **Confirmar el criterio de éxito antes de medir**, como exige `doc/PLAN_VALIDACION_EXPERIMENTAL_AB_ESP32.md`. Distinguir las mediciones sintéticas de este baseline de las mediciones pendientes con datasets.
+6. **Confirmar el criterio de éxito antes de medir**, como exige `doc/PLAN_VALIDACION_EXPERIMENTAL_AB_ESP32.md`. Distinguir las mediciones sintéticas históricas de las mediciones pendientes con datasets.
 
 ### Notas de riesgo
 

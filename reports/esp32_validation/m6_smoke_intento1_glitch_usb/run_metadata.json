@@ -1,0 +1,35 @@
+{
+  "suite": "smoke",
+  "mode": "fast",
+  "port": "/dev/ttyUSB0",
+  "baud": 115200,
+  "dataset_dir": "notebooks/data/esp32_simulation/rule_based/smoke",
+  "output_dir": "reports/esp32_validation/m6_smoke",
+  "started_utc": "2026-10-11T23:21:33Z",
+  "finished_utc": "2026-10-11T23:26:47Z",
+  "elapsed_s": 314.197,
+  "versions": {
+    "python": "3.12.3",
+    "numpy": "2.4.4",
+    "pandas": "2.3.3",
+    "pyserial": "3.5"
+  },
+  "device_hello": [
+    "INFO,heap=194532,arena=81920,model=OK",
+    "READY,1"
+  ],
+  "dataset_source_hashes": {
+    "fall_csv": "notebooks/data/bronce/falls/KFall-Reduced.csv",
+    "fall_csv_sha256": "dfbbde497446c301351866a27b710a4650b8aa2a306eefec8ff4f483d978e08c",
+    "ecg_h5": "notebooks/data/oro/ecg/ptb_xl_250hz_lead_ii/PTB_XL_senal_250Hz_derivacion_II.h5",
+    "ecg_h5_sha256": "bf6ae877b45b3bb63d03ad2f40f42dbeb9304c97003d873491bafcc890547377"
+  },
+  "tflite_sha256": "e4fd65e3bb19ceb3312d6d23e6b8a795a882ed032edddb420844f605ea389de0",
+  "counts": {
+    "rows": 36,
+    "trials": 6,
+    "records": 10,
+    "scenarios": 20
+  },
+  "notes": "reference_class usa etiquetas de origen; el triaje desde salidas reales se reconstruye uniendo trial_A/record_B por fall_trial_id y ecg_id (M7). status distingue ok/error/timeout/missing_agent; un timeout nunca es prediccion."
+}

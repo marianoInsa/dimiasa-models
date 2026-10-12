@@ -46,6 +46,9 @@ dev = [
     "pytest>=8.0",
     "pytest-cov",
 ]
+serial = [
+    "pyserial>=3.5",
+]
 
 
 [tool.ruff]
