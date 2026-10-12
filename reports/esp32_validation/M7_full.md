@@ -24,7 +24,7 @@ Estado: **gate HITL aprobado** (2026-10-11); corrida, resumen y decisiones docum
 | INDETERMINADO | 3 | 2 |
 
 - 5 indeterminados (3 en trials Fall, 2 en ADL): salida conservadora de M1, nunca `ADL` dudoso; **no entran** en la matriz binaria y se informan aparte.
-- Sensibilidad 0,875 (7/8); especificidad 1,000 (7/7); precisión 1,000; F1 0,933 sobre predicciones válidas (14 de 20 trials).
+- Sensibilidad 1,000 (7/7 de las salidas válidas); especificidad 0,875 (7/8); precisión 0,875 (7/8); F1 0,933 sobre predicciones válidas (14 de 20 trials).
 - **A vs referencia de reglas del host: 20/20.** El dispositivo reproduce exactamente el contrato congelado en cada trial; las diferencias con las etiquetas KFall son de la capa de reglas (el trial recortado no llega a confirmar en algunos casos), no del firmware.
 - Latencia desde evento: no se informa (M1: KFall sin ancla temporal fiable).
 
@@ -35,7 +35,7 @@ Estado: **gate HITL aprobado** (2026-10-11); corrida, resumen y decisiones docum
 | ANORMAL | 16 | 4 |
 | NORMAL | 3 | 17 |
 
-- Sensibilidad 0,842; especificidad 0,810; precisión 0,800; F1 0,821.
+- Sensibilidad 0,800 (16/20); especificidad 0,850 (17/20); precisión 0,842 (16/19); F1 0,821.
 - Paridad con el host: **checksum del tensor 40/40** (preproceso bit-exacto), `q` exacto 37/40, `|Δq| ≤ 2` 40/40, máximo 2 LSB (redondeo de kernels TFLM vs TFLite, misma clase en todos).
 
 ## Triaje

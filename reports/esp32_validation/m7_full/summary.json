@@ -24,12 +24,12 @@
       },
       "indeterminados": 5,
       "tp": 7,
-      "fp": 0,
-      "fn": 1,
+      "fp": 1,
+      "fn": 0,
       "tn": 7,
-      "sensitivity": 0.875,
-      "specificity": 1.0,
-      "precision": 1.0,
+      "sensitivity": 1.0,
+      "specificity": 0.875,
+      "precision": 0.875,
       "f1": 0.9333333333333333
     },
     "vs_rules_reference": {
@@ -51,12 +51,12 @@
         }
       },
       "tp": 16,
-      "fp": 4,
-      "fn": 3,
+      "fp": 3,
+      "fn": 4,
       "tn": 17,
-      "sensitivity": 0.8421052631578947,
-      "specificity": 0.8095238095238095,
-      "precision": 0.8,
+      "sensitivity": 0.8,
+      "specificity": 0.85,
+      "precision": 0.8421052631578947,
       "f1": 0.8205128205128205
     },
     "vs_host_reference": {
@@ -106,6 +106,7 @@
       },
       "matches": 20,
       "total": 20,
+      "not_evaluable": 0,
       "mismatches": []
     }
   },
@@ -166,5 +167,7 @@
     "heap_min": 194268,
     "heap_max": 194532,
     "heap_last": 194268
-  }
+  },
+  "scheduling": null,
+  "repeats": null
 }

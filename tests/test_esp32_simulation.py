@@ -11,6 +11,7 @@ SCRIPTS = Path(__file__).resolve().parents[1] / "scripts" / "esp32_simulation"
 sys.path.insert(0, str(SCRIPTS))
 
 import replay  # noqa: E402
+import summarize  # noqa: E402
 
 
 def _write_csv(path: Path, header: list[str], rows: list[list]) -> None:
@@ -212,3 +213,23 @@ def test_esquema_y_escritura_de_results(tmp_path):
     assert data[1]["q"] == "-5"
     assert data[0]["fall_trial_id"] == ""
     assert data[0]["mode"] == "fast"
+
+
+def test_metrics_matrices_m7():
+    matrix_a = {"Fall": {"Fall": 7, "ADL": 1}, "ADL": {"ADL": 7}}
+    metrics = summarize._metrics(matrix_a, "Fall")
+    assert (metrics["tp"], metrics["fp"], metrics["fn"], metrics["tn"]) == (7, 1, 0, 7)
+    assert metrics["sensitivity"] == pytest.approx(1.0)
+    assert metrics["specificity"] == pytest.approx(0.875)
+    assert metrics["precision"] == pytest.approx(0.875)
+
+    matrix_b = {
+        "NORMAL": {"NORMAL": 17, "ANORMAL": 4},
+        "ANORMAL": {"NORMAL": 3, "ANORMAL": 16},
+    }
+    metrics = summarize._metrics(matrix_b, "ANORMAL")
+    assert (metrics["tp"], metrics["fp"], metrics["fn"], metrics["tn"]) == (16, 3, 4, 17)
+    assert metrics["sensitivity"] == pytest.approx(0.8)
+    assert metrics["specificity"] == pytest.approx(0.85)
+    assert metrics["precision"] == pytest.approx(16 / 19)
+    assert metrics["f1"] == pytest.approx(0.8205128205128205)

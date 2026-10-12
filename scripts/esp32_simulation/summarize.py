@@ -32,8 +32,8 @@ import replay  # noqa: E402
 def _metrics(matrix: dict, positive: str) -> dict:
     """Sens/esp/prec/F1 para una matriz {predicho: {real: n}}."""
     tp = matrix.get(positive, {}).get(positive, 0)
-    fp = sum(matrix.get(label, {}).get(positive, 0) for label in matrix if label != positive)
-    fn = sum(count for label, count in matrix.get(positive, {}).items() if label != positive)
+    fp = sum(count for real, count in matrix.get(positive, {}).items() if real != positive)
+    fn = sum(row.get(positive, 0) for label, row in matrix.items() if label != positive)
     tn = sum(
         count
         for label, row in matrix.items()

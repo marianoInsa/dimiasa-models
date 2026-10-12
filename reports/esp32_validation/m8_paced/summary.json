@@ -41,12 +41,12 @@
         }
       },
       "tp": 0,
-      "fp": 0,
-      "fn": 3,
+      "fp": 3,
+      "fn": 0,
       "tn": 0,
-      "sensitivity": 0.0,
-      "specificity": null,
-      "precision": null,
+      "sensitivity": null,
+      "specificity": 0.0,
+      "precision": 0.0,
       "f1": null
     },
     "vs_host_reference": {
